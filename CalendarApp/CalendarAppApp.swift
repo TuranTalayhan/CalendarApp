@@ -5,8 +5,8 @@
 //  Created by Turan Talayhan on 19/02/2025.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct CalendarAppApp: App {
@@ -25,7 +25,7 @@ struct CalendarAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            EventsView()
         }
         .modelContainer(sharedModelContainer)
     }

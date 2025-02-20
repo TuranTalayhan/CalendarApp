@@ -1,14 +1,14 @@
 //
-//  ContentView.swift
+//  EventsView.swift
 //  CalendarApp
 //
 //  Created by Turan Talayhan on 19/02/2025.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
-struct ContentView: View {
+struct EventsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
 
@@ -56,6 +56,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    EventsView()
         .modelContainer(for: Item.self, inMemory: true)
 }
