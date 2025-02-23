@@ -28,6 +28,18 @@ struct CalendarView: View {
         }
     }
 
+    private var selectedDayMonth: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMMM"
+        return dateFormatter.string(from: selectedDate)
+    }
+
+    private var selectedYear: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        return dateFormatter.string(from: selectedDate)
+    }
+
     var body: some View {
         NavigationStack {
             List {
@@ -36,7 +48,7 @@ struct CalendarView: View {
                         .datePickerStyle(.graphical)
                 }
                 if !currentEvents.isEmpty {
-                    Section(header: Text("DAY MONTH"), footer: Text("YEAR")) {
+                    Section(header: Text(selectedDayMonth), footer: Text(selectedYear)) {
                         ForEach(currentEvents) { event in
                             NavigationLink(destination: EventDetailView(event: event)) {
                                 Text(event.title)
