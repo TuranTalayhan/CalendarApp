@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 
 @Model
-final class Event {
+final class Event: Comparable {
     var title: String
     var allDay: Bool
     var startDate: Date
@@ -24,5 +24,13 @@ final class Event {
         self.endDate = endTime
         self.url = url
         self.notes = notes
+    }
+
+    static func < (lhs: Event, rhs: Event) -> Bool {
+        lhs.startDate < rhs.startDate
+    }
+
+    static func > (lhs: Event, rhs: Event) -> Bool {
+        lhs.startDate > rhs.endDate
     }
 }

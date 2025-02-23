@@ -12,11 +12,19 @@ struct EventsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var events: [Event]
     @State private var searchText: String = ""
+    private var selectedEvents: [Event] {
+        if searchText.isEmpty {
+            return events.sorted()
+        } else {
+            return events.filter { $0.title.lowercased().contains(searchText.lowercased()) }
+                .sorted()
+        }
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(events) { event in
+                ForEach(selectedEvents) { event in
                     NavigationLink(destination: EventDetailView(event: event)) {
                         Text(event.title)
                     }
@@ -31,7 +39,7 @@ struct EventsView: View {
     private func deleteEvents(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(events[index])
+                modelContext.delete(selectedEvents[index])
             }
         }
     }
