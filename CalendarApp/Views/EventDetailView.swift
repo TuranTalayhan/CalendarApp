@@ -14,6 +14,9 @@ struct EventDetailView: View {
     let event: Event
     @State private var isPresented = false
     @State private var showingConfirmation: Bool = false
+    private var dataService: DataService {
+        DataService(context: modelContext)
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -74,7 +77,7 @@ struct EventDetailView: View {
 
     private func deleteEvent() {
         withAnimation {
-            modelContext.delete(event)
+            dataService.deleteEvent(event)
             self.presentationMode.wrappedValue.dismiss()
         }
     }

@@ -14,13 +14,17 @@ struct CalendarView: View {
     @State private var showSheet: Bool = false
     @State private var selectedDate: Date = .init()
     @State private var endDate: Date = .init()
+    private var dataService: DataService {
+        DataService(context: modelContext)
+    }
+
     private var currentEvents: [Event] {
         let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: selectedDate)
         return events.filter {
             let startDay = calendar.startOfDay(for: $0.startDate)
-            let endDay = calendar.startOfDay(for: $0.endDate)
-            return (startDay ... endDay).contains(selectedDay)
+            let endDay = calendar.startOfDay(for: $0.endDate).addingTimeInterval(24 * 60 * 60)
+            return (startDay ..< endDay).contains(selectedDay)
         }
     }
 
@@ -62,7 +66,7 @@ struct CalendarView: View {
     private func deleteEvents(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(currentEvents[index])
+                dataService.deleteEvent(currentEvents[index])
             }
         }
     }

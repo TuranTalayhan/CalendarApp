@@ -16,6 +16,9 @@ struct NewEventView: View {
     @State private var isAllDay: Bool = false
     @State private var url: String = ""
     @State private var notes: String = ""
+    private var dataService: DataService {
+        DataService(context: modelContext)
+    }
 
     var body: some View {
         NavigationStack {
@@ -69,8 +72,7 @@ struct NewEventView: View {
 
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
-            let newEvent = Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes)
-            modelContext.insert(newEvent)
+            dataService.addEvent(title, isAllDay, startDate, endDate, url, notes)
             isPresented = false
         }
     }

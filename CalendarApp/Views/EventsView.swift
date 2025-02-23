@@ -12,6 +12,10 @@ struct EventsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var events: [Event]
     @State private var searchText: String = ""
+    private var dataService: DataService {
+        DataService(context: modelContext)
+    }
+
     private var selectedEvents: [Event] {
         if searchText.isEmpty {
             return events.sorted()
@@ -39,7 +43,7 @@ struct EventsView: View {
     private func deleteEvents(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(selectedEvents[index])
+                dataService.deleteEvent(selectedEvents[index])
             }
         }
     }

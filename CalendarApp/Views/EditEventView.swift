@@ -19,7 +19,11 @@ struct EditEventView: View {
     @State private var url: String = ""
     @State private var notes: String = ""
     @State private var showingConfirmation: Bool = false
-    var updated: Bool {
+    private var dataService: DataService {
+        DataService(context: modelContext)
+    }
+
+    private var updated: Bool {
         title != event.title ||
             allDay != event.allDay ||
             startDate != event.startDate ||
@@ -109,7 +113,7 @@ struct EditEventView: View {
 
     private func deleteEvent() {
         withAnimation {
-            modelContext.delete(event)
+            dataService.deleteEvent(event)
             isPresented = false
             parentDismiss()
         }
