@@ -12,7 +12,7 @@ import SwiftUI
 struct CalendarAppApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Event.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct CalendarAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            EventsView()
+            ContentView()
         }
         .modelContainer(sharedModelContainer)
     }
