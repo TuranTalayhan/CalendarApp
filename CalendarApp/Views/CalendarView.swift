@@ -18,8 +18,8 @@ struct CalendarView: View {
         let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: selectedDate)
         return events.filter {
-            let startDay = calendar.startOfDay(for: $0.startTime)
-            let endDay = calendar.startOfDay(for: $0.endTime)
+            let startDay = calendar.startOfDay(for: $0.startDate)
+            let endDay = calendar.startOfDay(for: $0.endDate)
             return (startDay ... endDay).contains(selectedDay)
         }
     }

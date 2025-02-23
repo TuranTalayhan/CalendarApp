@@ -9,8 +9,11 @@ import SwiftUI
 
 struct EventDetailView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
     let event: Event
+    @State private var isPresented = false
+    @State private var showingConfirmation: Bool = false
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -18,9 +21,9 @@ struct EventDetailView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.bottom)
-            Text("\(dayOfWeek(event.startTime)), \(event.startTime, style: .date)")
+            Text("\(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
                 .foregroundColor(.secondary)
-            Text(event.allDay ? "All day" : "from \(event.startTime, style: .time) to \(event.endTime, style: .time)")
+            Text(event.allDay ? "All day" : "from \(event.startDate, style: .time) to \(event.endDate, style: .time)")
                 .foregroundColor(.secondary)
                 .padding(.bottom)
             if let url = event.url {
@@ -36,8 +39,12 @@ struct EventDetailView: View {
                 Divider()
             }
             Spacer()
-            Button("Delete Event") {
-                deleteEvent()
+            Button(role: .destructive, action: { showingConfirmation = true }) {
+                Text("Delete Event")
+            }
+            .confirmationDialog("Are you sure you want to delete this event?", isPresented: $showingConfirmation, titleVisibility: .visible) {
+                Button("Delete Event", role: .destructive, action: deleteEvent)
+                Button("Cancel", role: .cancel, action: {})
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -45,6 +52,16 @@ struct EventDetailView: View {
         }
         .navigationTitle("Event Details")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isPresented) {
+            EditEventView(isPresented: $isPresented, parentDismiss: dismiss, event: event)
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: { isPresented = true }) {
+                    Text("Edit")
+                }
+            }
+        }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
