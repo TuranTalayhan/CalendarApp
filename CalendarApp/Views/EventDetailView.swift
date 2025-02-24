@@ -24,11 +24,25 @@ struct EventDetailView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.bottom)
-            Text("\(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
-                .foregroundColor(.secondary)
-            Text(event.allDay ? "All day" : "from \(event.startDate, style: .time) to \(event.endDate, style: .time)")
-                .foregroundColor(.secondary)
-                .padding(.bottom)
+            if dayMonthYear(event.startDate) == dayMonthYear(event.endDate) {
+                Text("\(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
+                    .foregroundColor(.secondary)
+                Text(event.allDay ? "All day" : "from \(event.startDate, style: .time) to \(event.endDate, style: .time)")
+                    .foregroundColor(.secondary)
+                    .padding(.bottom)
+            } else if event.allDay {
+                Text("All day from \(event.startDate, style: .date)")
+                    .foregroundColor(.secondary)
+                Text("to \(event.endDate, style: .date)")
+                    .foregroundColor(.secondary)
+                    .padding(.bottom)
+            } else {
+                Text("from \(event.startDate, style: .time) \(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
+                    .foregroundColor(.secondary)
+                Text("to \(event.endDate, style: .time) \(dayOfWeek(event.endDate)), \(event.endDate, style: .date)")
+                    .foregroundColor(.secondary)
+                    .padding(.bottom)
+            }
             if let url = event.url {
                 Text("URL")
                 Link("\(url)", destination: url)
@@ -75,6 +89,12 @@ struct EventDetailView: View {
         return formatter.string(from: date)
     }
 
+    private func dayMonthYear(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM yyyy"
+        return formatter.string(from: date)
+    }
+
     private func deleteEvent() {
         withAnimation {
             dataService.deleteEvent(event)
@@ -84,5 +104,5 @@ struct EventDetailView: View {
 }
 
 #Preview {
-    EventDetailView(event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content"))
+    EventDetailView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content"))
 }
