@@ -18,6 +18,10 @@ struct CalendarView: View {
         DataService(context: modelContext)
     }
 
+    private var dateFormatService: DateFormatService {
+        DateFormatService()
+    }
+
     private var currentEvents: [Event] {
         let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: selectedDate)
@@ -28,18 +32,6 @@ struct CalendarView: View {
         }
     }
 
-    private var selectedDayMonth: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d MMMM"
-        return dateFormatter.string(from: selectedDate)
-    }
-
-    private var selectedYear: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy"
-        return dateFormatter.string(from: selectedDate)
-    }
-
     var body: some View {
         NavigationStack {
             List {
@@ -48,7 +40,7 @@ struct CalendarView: View {
                         .datePickerStyle(.graphical)
                 }
                 if !currentEvents.isEmpty {
-                    Section(header: Text(selectedDayMonth), footer: Text(selectedYear)) {
+                    Section(header: Text("\(dateFormatService.formatDay(selectedDate)) \(dateFormatService.formatMonth(selectedDate))"), footer: Text(dateFormatService.formatYear(selectedDate))) {
                         ForEach(currentEvents) { event in
                             NavigationLink(destination: EventDetailView(event: event)) {
                                 Text(event.title)

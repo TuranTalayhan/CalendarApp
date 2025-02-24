@@ -10,6 +10,9 @@ import SwiftData
 
 class DataService {
     private let modelContext: ModelContext
+    private var userNotificationService: UserNotificationService {
+        UserNotificationService()
+    }
 
     init(context: ModelContext) {
         self.modelContext = context
@@ -22,6 +25,7 @@ class DataService {
     }
 
     func deleteEvent(_ event: Event) {
+        userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
         modelContext.delete(event)
         try? modelContext.save()
     }

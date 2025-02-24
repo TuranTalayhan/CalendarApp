@@ -18,14 +18,18 @@ struct EventDetailView: View {
         DataService(context: modelContext)
     }
 
+    private var dateFormatService: DateFormatService {
+        DateFormatService()
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             Text(event.title)
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.bottom)
-            if dayMonthYear(event.startDate) == dayMonthYear(event.endDate) {
-                Text("\(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
+            if dateFormatService.formatDayWithMonthAndYear(event.startDate) == dateFormatService.formatDayWithMonthAndYear(event.endDate) {
+                Text("\(dateFormatService.formatDayOfWeek(event.startDate)), \(event.startDate, style: .date)")
                     .foregroundColor(.secondary)
                 Text(event.allDay ? "All day" : "from \(event.startDate, style: .time) to \(event.endDate, style: .time)")
                     .foregroundColor(.secondary)
@@ -37,9 +41,9 @@ struct EventDetailView: View {
                     .foregroundColor(.secondary)
                     .padding(.bottom)
             } else {
-                Text("from \(event.startDate, style: .time) \(dayOfWeek(event.startDate)), \(event.startDate, style: .date)")
+                Text("from \(event.startDate, style: .time) \(dateFormatService.formatDayOfWeek(event.startDate)), \(event.startDate, style: .date)")
                     .foregroundColor(.secondary)
-                Text("to \(event.endDate, style: .time) \(dayOfWeek(event.endDate)), \(event.endDate, style: .date)")
+                Text("to \(event.endDate, style: .time) \(dateFormatService.formatDayOfWeek(event.endDate)), \(event.endDate, style: .date)")
                     .foregroundColor(.secondary)
                     .padding(.bottom)
             }
@@ -81,18 +85,6 @@ struct EventDetailView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-
-    private func dayOfWeek(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
-        return formatter.string(from: date)
-    }
-
-    private func dayMonthYear(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMMM yyyy"
-        return formatter.string(from: date)
     }
 
     private func deleteEvent() {

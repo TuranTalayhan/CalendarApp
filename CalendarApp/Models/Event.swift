@@ -9,7 +9,8 @@ import Foundation
 import SwiftData
 
 @Model
-final class Event: Comparable {
+final class Event: Comparable, Identifiable {
+    var id: String
     var title: String
     var allDay: Bool
     var startDate: Date
@@ -18,6 +19,7 @@ final class Event: Comparable {
     var notes: String?
 
     init(title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?) {
+        self.id = UUID().uuidString
         self.title = title
         self.allDay = allDay
         self.startDate = startTime

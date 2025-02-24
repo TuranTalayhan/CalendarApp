@@ -23,6 +23,10 @@ struct EditEventView: View {
         DataService(context: modelContext)
     }
 
+    private var userNotificationService: UserNotificationService {
+        UserNotificationService()
+    }
+
     private var updated: Bool {
         title != event.title ||
             allDay != event.allDay ||
@@ -109,6 +113,8 @@ struct EditEventView: View {
         event.startDate = startDate
         event.url = newURL
         event.notes = notes.isEmpty ? nil : notes
+        userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
+        userNotificationService.sendNotification(event)
     }
 
     private func deleteEvent() {

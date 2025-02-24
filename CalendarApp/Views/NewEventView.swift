@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewEventView: View {
     @Environment(\.modelContext) private var modelContext
+    @AppStorage("isNotificationAuthorized") private var isNotificationAuthorized: Bool = false
     @Binding var isPresented: Bool
     @Binding var startDate: Date
     @Binding var endDate: Date
@@ -18,6 +19,14 @@ struct NewEventView: View {
     @State private var notes: String = ""
     private var dataService: DataService {
         DataService(context: modelContext)
+    }
+
+    private var dateFormatService: DateFormatService {
+        DateFormatService()
+    }
+
+    private var userNotificationService: UserNotificationService {
+        UserNotificationService()
     }
 
     var body: some View {
@@ -73,6 +82,13 @@ struct NewEventView: View {
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
             dataService.addEvent(title, isAllDay, startDate, endDate, url, notes)
+            if isNotificationAuthorized {
+                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes), dateFormatService: dateFormatService)
+            } else {
+                Task {
+                    isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()
+                }
+            }
             isPresented = false
         }
     }
