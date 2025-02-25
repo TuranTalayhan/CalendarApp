@@ -63,6 +63,7 @@ struct EditEventView: View {
 
                 Section {
                     TextField("URL", text: $url)
+                        .autocapitalization(.none)
                     TextField("Notes", text: $notes, axis: .vertical)
                 }
 
