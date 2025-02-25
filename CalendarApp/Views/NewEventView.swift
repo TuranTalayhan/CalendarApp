@@ -18,6 +18,7 @@ struct NewEventView: View {
     @State private var url: String = ""
     @State private var notes: String = ""
     @State private var showAlert: Bool = false
+    @State private var alert: Int = -1
     private var dataService: DataService {
         DataService(context: modelContext)
     }
@@ -41,6 +42,22 @@ struct NewEventView: View {
                     Toggle("All-Day", isOn: $isAllDay)
                     DatePicker("Starts", selection: $startDate, displayedComponents: isAllDay == true ? [.date] : [.date, .hourAndMinute])
                     DatePicker("Ends", selection: $endDate, displayedComponents: isAllDay == true ? [.date] : [.date, .hourAndMinute])
+                }
+
+                Section {
+                    Picker("Alert", selection: $alert) {
+                        Text("None").tag(-1)
+                        Text("At time of event").tag(0)
+                        Text("5 minutes before").tag(5)
+                        Text("10 minutes before").tag(10)
+                        Text("15 minutes before").tag(15)
+                        Text("30 minutes before").tag(30)
+                        Text("1 hour before").tag(60)
+                        Text("2 hours before").tag(60 * 2)
+                        Text("1 day before").tag(60 * 24)
+                        Text("2 day before").tag(60 * 24 * 2)
+                        Text("1 week before").tag(60 * 24 * 7)
+                    }
                 }
 
                 Section {
@@ -89,10 +106,11 @@ struct NewEventView: View {
 
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
-            dataService.addEvent(title, isAllDay, startDate, endDate, url, notes)
-            if isNotificationAuthorized {
-                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes), dateFormatService: dateFormatService)
-            } else {
+            dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert)
+
+            if isNotificationAuthorized && alert > 0 {
+                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert), dateFormatService: dateFormatService, minutesBefore: alert)
+            } else if alert > 0 {
                 Task {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()
                 }

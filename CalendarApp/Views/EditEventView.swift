@@ -20,6 +20,7 @@ struct EditEventView: View {
     @State private var notes: String = ""
     @State private var showingConfirmation: Bool = false
     @State private var showAlert: Bool = false
+    @State private var alert: Int = -1
     private var dataService: DataService {
         DataService(context: modelContext)
     }
@@ -47,6 +48,7 @@ struct EditEventView: View {
         self._endDate = State(initialValue: event.endDate)
         self._url = State(initialValue: event.url?.absoluteString ?? "")
         self._notes = State(initialValue: event.notes ?? "")
+        self._alert = State(initialValue: event.alert)
     }
 
     var body: some View {
@@ -59,6 +61,22 @@ struct EditEventView: View {
                     Toggle("All-Day", isOn: $allDay)
                     DatePicker("Starts", selection: $startDate, displayedComponents: allDay == true ? [.date] : [.date, .hourAndMinute])
                     DatePicker("Ends", selection: $endDate, displayedComponents: allDay == true ? [.date] : [.date, .hourAndMinute])
+                }
+
+                Section {
+                    Picker("Alert", selection: $alert) {
+                        Text("None").tag(-1)
+                        Text("At time of event").tag(0)
+                        Text("5 minutes before").tag(5)
+                        Text("10 minutes before").tag(10)
+                        Text("15 minutes before").tag(15)
+                        Text("30 minutes before").tag(30)
+                        Text("1 hour before").tag(60)
+                        Text("2 hours before").tag(60 * 2)
+                        Text("1 day before").tag(60 * 24)
+                        Text("2 day before").tag(60 * 24 * 2)
+                        Text("1 week before").tag(60 * 24 * 7)
+                    }
                 }
 
                 Section {
@@ -122,8 +140,10 @@ struct EditEventView: View {
         event.startDate = startDate
         event.url = newURL
         event.notes = notes.isEmpty ? nil : notes
-        userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
-        userNotificationService.sendNotification(event)
+        if alert > 0 {
+            userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
+            userNotificationService.sendNotification(event)
+        }
     }
 
     private func deleteEvent() {
@@ -137,5 +157,5 @@ struct EditEventView: View {
 
 #Preview {
     @Previewable @Environment(\.dismiss) var dismiss: DismissAction
-    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content"))
+    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1))
 }

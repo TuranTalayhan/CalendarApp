@@ -10,7 +10,7 @@ import UserNotifications
 class UserNotificationService {
     private let center = UNUserNotificationCenter.current()
 
-    func sendNotification(_ event: Event, dateFormatService: DateFormatService = DateFormatService(), minutesBefore: Int = 0) {
+    func sendNotification(_ event: Event, dateFormatService: DateFormatService = DateFormatService(), minutesBefore: Int = -1) {
         guard let date = Calendar.current.date(byAdding: .minute, value: -minutesBefore, to: event.startDate) else {
             return
         }

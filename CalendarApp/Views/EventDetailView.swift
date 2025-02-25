@@ -96,5 +96,5 @@ struct EventDetailView: View {
 }
 
 #Preview {
-    EventDetailView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content"))
+    EventDetailView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1))
 }

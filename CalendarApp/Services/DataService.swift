@@ -18,8 +18,8 @@ class DataService {
         self.modelContext = context
     }
 
-    func addEvent(_ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?) {
-        let newEvent = Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes)
+    func addEvent(_ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?, _ alert: Int) {
+        let newEvent = Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert)
         modelContext.insert(newEvent)
         try? modelContext.save()
     }
