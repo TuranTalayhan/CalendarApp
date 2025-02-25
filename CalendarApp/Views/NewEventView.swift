@@ -10,13 +10,14 @@ import SwiftUI
 struct NewEventView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("isNotificationAuthorized") private var isNotificationAuthorized: Bool = false
-    @Binding var isPresented: Bool
+    @Binding var showSheet: Bool
     @Binding var startDate: Date
     @Binding var endDate: Date
     @State private var title: String = ""
     @State private var isAllDay: Bool = false
     @State private var url: String = ""
     @State private var notes: String = ""
+    @State private var showAlert: Bool = false
     private var dataService: DataService {
         DataService(context: modelContext)
     }
@@ -53,6 +54,10 @@ struct NewEventView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
+                        guard startDate < endDate else {
+                            showAlert = true
+                            return
+                        }
                         let newURL: URL?
                         if url.starts(with: "https://") || url.starts(with: "http://") {
                             newURL = URL(string: url)
@@ -69,9 +74,12 @@ struct NewEventView: View {
                     }) {
                         Text("Add")
                     }.disabled(title.isEmpty)
+                        .alert(isPresented: $showAlert) {
+                            Alert(title: Text("Cannot Save Event"), message: Text("The start date must be before the end date"))
+                        }
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { isPresented = false }) {
+                    Button(action: { showSheet = false }) {
                         Text("Cancel")
                     }
                 }
@@ -89,7 +97,7 @@ struct NewEventView: View {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()
                 }
             }
-            isPresented = false
+            showSheet = false
         }
     }
 }
@@ -101,7 +109,7 @@ struct NewEventView: View {
             Text("Test")
         }
         .sheet(isPresented: $isPresented) { NewEventView(
-            isPresented: $isPresented, startDate: .constant(Date()), endDate: .constant(Date()))
+            showSheet: $isPresented, startDate: .constant(Date()), endDate: .constant(Date()))
         }
     }
 }

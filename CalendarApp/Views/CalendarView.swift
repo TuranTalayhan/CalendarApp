@@ -52,7 +52,7 @@ struct CalendarView: View {
             }
             .navigationTitle("Calendar")
             .sheet(isPresented: $showSheet) {
-                NewEventView(isPresented: $showSheet, startDate: $selectedDate, endDate: $endDate)
+                NewEventView(showSheet: $showSheet, startDate: $selectedDate, endDate: $endDate)
             }
             .toolbar {
                 ToolbarItem {
