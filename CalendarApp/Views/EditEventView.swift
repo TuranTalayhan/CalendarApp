@@ -19,6 +19,7 @@ struct EditEventView: View {
     @State private var url: String = ""
     @State private var notes: String = ""
     @State private var showingConfirmation: Bool = false
+    @State private var showAlert: Bool = false
     private var dataService: DataService {
         DataService(context: modelContext)
     }
@@ -81,12 +82,19 @@ struct EditEventView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
+                        guard startDate < endDate else {
+                            showAlert = true
+                            return
+                        }
                         save()
                         isPresented = false
                     }) {
                         Text("Done")
                     }
                     .disabled(!updated)
+                    .alert(isPresented: $showAlert) {
+                        Alert(title: Text("Cannot Save Event"), message: Text("The start date must be before the end date"))
+                    }
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: {
