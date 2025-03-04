@@ -14,6 +14,7 @@ struct EventDetailView: View {
     let event: Event
     @State private var isPresented = false
     @State private var showingConfirmation: Bool = false
+    @State private var temperatureAlert: Bool = false
     @State private var temperature: Double?
     private var dataService: DataService {
         DataService(context: modelContext)
@@ -67,8 +68,8 @@ struct EventDetailView: View {
             }
 
             if let temp = temperature, temp != 0 {
-                TemperatureView(temperature: temperature!)
-            } else {
+                TemperatureView(temperature: temp)
+            } else if temperature == nil {
                 ProgressView()
             }
             Spacer()
@@ -83,11 +84,18 @@ struct EventDetailView: View {
             .frame(maxWidth: .infinity)
             .foregroundColor(.red)
         }
+        .alert(
+            isPresented: $temperatureAlert)
+        {
+            Alert(title: Text("Data Unavailable"),
+                  message: Text("Temperature data is unavailable for the selected date. Please select a date within the past 48 hours."))
+        }
         .navigationTitle("Event Details")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             temperature = getTemperature(response: await fetchTemperature())
         }
+        .onChange(of: temperature == 0) { temperatureAlert = true }
         .sheet(isPresented: $isPresented) {
             EditEventView(isPresented: $isPresented, parentDismiss: dismiss, event: event)
         }
