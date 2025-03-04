@@ -23,10 +23,6 @@ class DMIAPIService {
         }
         let (data, _) = try await URLSession.shared.data(from: url)
 
-        if let jsonString = String(data: data, encoding: .utf8) {
-            print("Raw JSON Response: \(jsonString)")
-        }
-
         let decoded = try JSONDecoder().decode(CoverageJSONResponse.self, from: data)
 
         return decoded
