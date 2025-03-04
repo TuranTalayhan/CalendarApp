@@ -88,7 +88,7 @@ struct EventDetailView: View {
             isPresented: $temperatureAlert)
         {
             Alert(title: Text("Data Unavailable"),
-                  message: Text("Temperature data is unavailable for the selected date. Please select a date within the past 48 hours."))
+                  message: Text("Temperature data is unavailable for the selected date."))
         }
         .navigationTitle("Event Details")
         .navigationBarTitleDisplayMode(.inline)
