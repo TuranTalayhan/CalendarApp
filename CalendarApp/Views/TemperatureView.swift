@@ -12,22 +12,24 @@ struct TemperatureView: View {
 
     var body: some View {
         if temperature <= 0 {
-            Text("snowflake")
+            Text("❄️")
+
         } else if temperature <= 10 {
-            Text("cloudy")
+            Text("☁️")
 
         } else if temperature <= 20 {
-            Text("sunny")
+            Text("🌤")
 
         } else if temperature <= 30 {
-            Text("more sunny")
+            Text("☀️")
 
         } else if temperature <= 35 {
-            Text("even more sunny")
+            Text("🔥")
 
         } else {
-            Text("desert")
+            Text("🏜")
         }
+
         Text("\(temperature, specifier: "%.1f") °C")
     }
 }
