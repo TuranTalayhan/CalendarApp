@@ -22,40 +22,35 @@ The **CalendarView** displays all your events in a calendar format (day, week, o
 - Navigate through months or days using gestures or navigation arrows.
 - Tap on any event to open it in the **EditEventView**.
 
-<!-- Insert CalendarView screenshot here -->
-![Calendar View](screenshots/calendar-view.png)  <!-- Replace this with your actual screenshot path -->
+![Calendar View](Screenshots/CalendarView.png)
 
 ### EventsView
 The **EventsView** presents your events in a list format, allowing you to view them chronologically.
 
 - You can quickly access any event’s details or edit them.
 
-<!-- Insert EventsView screenshot here -->
-![Events View](screenshots/events-view.png)  <!-- Replace this with your actual screenshot path -->
+![Events View](Screenshots/EditEventView.png)
 
 ### NewEventView
 In the **NewEventView**, you can create new events by entering the event title, description, start date, time, and more.
 
 - The view also integrates **TemperatureView**, where it fetches the weather for the event’s start date.
 
-<!-- Insert NewEventView screenshot here -->
-![New Event View](screenshots/new-event-view.png)  <!-- Replace this with your actual screenshot path -->
+![New Event View](Screenshots/NewEventView.png)
 
 ### EditEventView
 The **EditEventView** is where you can modify the details of an existing event. You can update the title, description, start date, end date, time, and more.
 
 - Changes are saved automatically or you can cancel the edits if necessary.
 
-<!-- Insert EditEventView screenshot here -->
-![Edit Event View](screenshots/edit-event-view.png)  <!-- Replace this with your actual screenshot path -->
+![Edit Event View](Screenshots/EditEventView.png)
 
 ### TemperatureView
 The **TemperatureView** fetches weather data using **DMI's Open Data API** to show the temperature for the event's start date.
 
 - This is helpful for planning your event based on expected weather conditions.
 
-<!-- Insert TemperatureView screenshot here -->
-![Temperature View](screenshots/temperature-view.png)  <!-- Replace this with your actual screenshot path -->
+![Temperature View](Screenshots/EventDetailView.png)
 
 ## Installation
 
