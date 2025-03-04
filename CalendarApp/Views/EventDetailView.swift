@@ -14,12 +14,17 @@ struct EventDetailView: View {
     let event: Event
     @State private var isPresented = false
     @State private var showingConfirmation: Bool = false
+    @State private var temperature: Double?
     private var dataService: DataService {
         DataService(context: modelContext)
     }
 
     private var dateFormatService: DateFormatService {
         DateFormatService()
+    }
+
+    private var dmiAPIService: DMIAPIService {
+        DMIAPIService()
     }
 
     var body: some View {
@@ -58,6 +63,13 @@ struct EventDetailView: View {
                 Text(notes)
                     .foregroundColor(.secondary)
                 Divider()
+                    .padding(.bottom)
+            }
+
+            if let temp = temperature, temp != 0 {
+                TemperatureView(temperature: temperature!)
+            } else {
+                ProgressView()
             }
             Spacer()
             Button(role: .destructive, action: { showingConfirmation = true }) {
@@ -73,6 +85,9 @@ struct EventDetailView: View {
         }
         .navigationTitle("Event Details")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            temperature = getTemperature(response: await fetchTemperature())
+        }
         .sheet(isPresented: $isPresented) {
             EditEventView(isPresented: $isPresented, parentDismiss: dismiss, event: event)
         }
@@ -85,6 +100,31 @@ struct EventDetailView: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    private func fetchTemperature() async -> CoverageJSONResponse? {
+        do {
+            let response = try await dmiAPIService.fetchWeatherData()
+            return response
+        } catch {
+            print("Error fetching Temperature data: \(error)")
+            return nil
+        }
+    }
+
+    private func getTemperature(response: CoverageJSONResponse?) -> Double {
+        var dateString = event.startDate.ISO8601Format()
+
+        if let tIndex = dateString.firstIndex(of: "T") {
+            let tIndexAfterT = dateString.index(tIndex, offsetBy: 2)
+            dateString = dateString[...tIndexAfterT] + ":00:00.000Z"
+        }
+
+        if let timeIndex = response?.domain.axes.t.values.firstIndex(of: dateString) {
+            return (response?.ranges["temperature-0m"]?.values[timeIndex] ?? 273.15) - 273.15
+        }
+
+        return 0
     }
 
     private func deleteEvent() {
