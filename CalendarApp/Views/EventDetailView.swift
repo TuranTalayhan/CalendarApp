@@ -20,10 +20,6 @@ struct EventDetailView: View {
         DataService(context: modelContext)
     }
 
-    private var dateFormatService: DateFormatService {
-        DateFormatService()
-    }
-
     private var dmiAPIService: DMIAPIService {
         DMIAPIService()
     }
@@ -34,25 +30,9 @@ struct EventDetailView: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .padding(.bottom)
-            if dateFormatService.formatDayWithMonthAndYear(event.startDate) == dateFormatService.formatDayWithMonthAndYear(event.endDate) {
-                Text("\(dateFormatService.formatDayOfWeek(event.startDate)), \(event.startDate, style: .date)")
-                    .foregroundColor(.secondary)
-                Text(event.allDay ? "All day" : "from \(event.startDate, style: .time) to \(event.endDate, style: .time)")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom)
-            } else if event.allDay {
-                Text("All day from \(event.startDate, style: .date)")
-                    .foregroundColor(.secondary)
-                Text("to \(event.endDate, style: .date)")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom)
-            } else {
-                Text("from \(event.startDate, style: .time) \(dateFormatService.formatDayOfWeek(event.startDate)), \(event.startDate, style: .date)")
-                    .foregroundColor(.secondary)
-                Text("to \(event.endDate, style: .time) \(dateFormatService.formatDayOfWeek(event.endDate)), \(event.endDate, style: .date)")
-                    .foregroundColor(.secondary)
-                    .padding(.bottom)
-            }
+
+            EventDateView(event: event)
+
             if let url = event.url {
                 Text("URL")
                 Link("\(url)", destination: url)
