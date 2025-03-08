@@ -108,9 +108,9 @@ struct NewEventView: View {
         withAnimation {
             dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert)
 
-            if isNotificationAuthorized && alert > 0 {
+            if isNotificationAuthorized && alert >= 0 {
                 userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert), dateFormatService: dateFormatService, minutesBefore: alert)
-            } else if alert > 0 {
+            } else if alert >= 0 {
                 Task {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()
                 }
