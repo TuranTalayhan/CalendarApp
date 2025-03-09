@@ -20,7 +20,7 @@ Welcome to the **Calendar App**! This app is part of my assignment for the **624
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/calendar-app.git
+   git clone https://github.com/TuranTalayhan/CalendarApp.git
    ```
 2.	Open the project in Xcode.
 3.	Build and run the app on the simulator or a connected device.
