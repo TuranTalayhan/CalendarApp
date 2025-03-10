@@ -9,6 +9,9 @@ import SwiftUI
 
 struct SignUpView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @State private var email: String = ""
+    @State private var username: String = ""
+    @State private var password: String = ""
 
     var body: some View {
         Form {
@@ -18,9 +21,9 @@ struct SignUpView: View {
                 .listRowBackground(Color.clear)
 
             Section {
-                TextField("Email", text: .constant(""))
-                TextField("Username", text: .constant(""))
-                SecureField("Password", text: .constant(""))
+                TextField("Email", text: $email)
+                TextField("Username", text: $username)
+                SecureField("Password", text: $password)
             }
 
             Button(action: {}) {
@@ -32,19 +35,6 @@ struct SignUpView: View {
             .buttonBorderShape(.capsule)
             .controlSize(.large)
             .listRowBackground(Color.clear)
-
-            Section {
-                HStack {
-                    Text("Already have an account?")
-                        .padding(.trailing)
-                    Button("Log in") {
-                        self.presentationMode.wrappedValue.dismiss()
-                    }
-                    .foregroundColor(.blue)
-                }
-                .frame(maxWidth: .infinity)
-                .listRowBackground(Color.clear)
-            }
         }
         .navigationTitle(Text("Sign Up"))
     }

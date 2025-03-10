@@ -8,8 +8,29 @@
 import SwiftUI
 
 struct ResetPasswordView: View {
+    @State private var email: String = ""
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Form {
+            Image("ForgotPassword")
+                .resizable()
+                .scaledToFit()
+                .listRowBackground(Color.clear)
+
+            Section {
+                TextField("Email", text: $email)
+            }
+
+            Button(action: {}) {
+                Text("Reset Password")
+                    .frame(maxWidth: .infinity)
+            }
+            .tint(.blue)
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.capsule)
+            .controlSize(.large)
+            .listRowBackground(Color.clear)
+        }
     }
 }
 

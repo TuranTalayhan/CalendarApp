@@ -8,19 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        TabView {
-            EventsView()
-                .tabItem {
-                    Image(systemName: "mappin")
-                    Text("Events")
-                }
+    @State var isLoggedIn: Bool = false
 
-            CalendarView()
-                .tabItem {
-                    Image(systemName: "calendar")
-                    Text("Calendar")
-                }
+    var body: some View {
+        if !isLoggedIn {
+            LogInView(isLoggedIn: $isLoggedIn)
+        } else {
+            TabView {
+                EventsView()
+                    .tabItem {
+                        Image(systemName: "mappin")
+                        Text("Events")
+                    }
+
+                CalendarView()
+                    .tabItem {
+                        Image(systemName: "calendar")
+                        Text("Calendar")
+                    }
+            }
         }
     }
 }
