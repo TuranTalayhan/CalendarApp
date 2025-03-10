@@ -26,6 +26,11 @@ struct ContentView: View {
                         Image(systemName: "calendar")
                         Text("Calendar")
                     }
+                SettingsView()
+                    .tabItem {
+                        Image(systemName: "gearshape")
+                        Text("Settings")
+                    }
             }
         }
     }
