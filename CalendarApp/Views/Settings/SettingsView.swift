@@ -11,7 +11,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(destination: SignUpView()) {
+                NavigationLink(destination: UserView()) {
                     HStack {
                         Image("Relaxing")
                             .resizable()

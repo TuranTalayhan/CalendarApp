@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct GroupsView: View {
+    let groups: [Group]
+
     var body: some View {
         List {
-            NavigationLink(destination: GroupDetailsView()) {
+            NavigationLink(destination: GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Something", password: "Something", email: "Something")]))) {
                 Text("Group 1")
             }
         }
@@ -27,5 +29,5 @@ struct GroupsView: View {
 }
 
 #Preview {
-    GroupsView()
+    GroupsView(groups: [Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Something", password: "Something", email: "Something")])])
 }

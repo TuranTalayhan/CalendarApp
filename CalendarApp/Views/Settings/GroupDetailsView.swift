@@ -8,11 +8,29 @@
 import SwiftUI
 
 struct GroupDetailsView: View {
+    let group: Group
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            Section("Name") {
+                Text(group.name)
+            }
+
+            Section("Group id") {
+                Text(group.id)
+            }
+
+            Section("Members") {
+                ForEach(group.members) { member in
+                    Text(member.username)
+                }
+            }
+        }
+        .navigationTitle(Text("Group details"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    GroupDetailsView()
+    GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Member 1", password: "Something", email: "Something"), User(id: UUID().uuidString, username: "Member 2", password: "Something", email: "Something")]))
 }
