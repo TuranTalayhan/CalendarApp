@@ -9,7 +9,7 @@ import SwiftData
 import SwiftUI
 
 @main
-struct CalendarAppApp: App {
+struct CalendarApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Event.self,
