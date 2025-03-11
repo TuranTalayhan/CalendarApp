@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-class DataService {
+class LocalDataService {
     private let modelContext: ModelContext
     private var userNotificationService: UserNotificationService {
         UserNotificationService()

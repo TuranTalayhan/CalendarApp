@@ -12,8 +12,8 @@ struct EventsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var events: [Event]
     @State private var searchText: String = ""
-    private var dataService: DataService {
-        DataService(context: modelContext)
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
     }
 
     private var selectedEvents: [Event] {

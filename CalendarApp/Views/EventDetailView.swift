@@ -16,8 +16,8 @@ struct EventDetailView: View {
     @State private var showingConfirmation: Bool = false
     @State private var temperatureAlert: Bool = false
     @State private var temperature: Double?
-    private var dataService: DataService {
-        DataService(context: modelContext)
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
     }
 
     private var dmiAPIService: DMIAPIService {

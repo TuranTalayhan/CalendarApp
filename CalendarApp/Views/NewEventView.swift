@@ -19,8 +19,8 @@ struct NewEventView: View {
     @State private var notes: String = ""
     @State private var showAlert: Bool = false
     @State private var alert: Int = -1
-    private var dataService: DataService {
-        DataService(context: modelContext)
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
     }
 
     private var dateFormatService: DateFormatService {

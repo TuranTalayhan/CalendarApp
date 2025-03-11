@@ -14,8 +14,8 @@ struct CalendarView: View {
     @State private var showSheet: Bool = false
     @State private var selectedDate: Date = .init()
     @State private var endDate: Date = .init()
-    private var dataService: DataService {
-        DataService(context: modelContext)
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
     }
 
     private var dateFormatService: DateFormatService {
