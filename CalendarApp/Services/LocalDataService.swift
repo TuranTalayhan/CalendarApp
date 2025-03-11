@@ -18,13 +18,13 @@ class LocalDataService {
         self.modelContext = context
     }
 
-    func addEvent(_ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?, _ alert: Int) {
-        let newEvent = Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert)
+    func addEvent(_ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?, _ alert: Int, _ assignedTo: User? = nil) {
+        let newEvent = Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, assignedTo: assignedTo)
         modelContext.insert(newEvent)
         try? modelContext.save()
     }
 
-    func addGroup(_ name: String, _ members: [String]) {
+    func addGroup(_ name: String, _ members: [User]) {
         let newGroup = Group(name: name, members: members)
         modelContext.insert(newGroup)
         try? modelContext.save()

@@ -40,7 +40,7 @@ struct CreateGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $isPresented) {
-            GroupDetailsView(group: Group(name: createdGroupName, members: ["User1"]))
+            GroupDetailsView(group: Group(name: createdGroupName, members: [User(username: "User1")]))
         }
         .alert(isPresented: $invalidName) {
             Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
@@ -52,7 +52,7 @@ struct CreateGroupView: View {
             invalidName = true
             return
         }
-        dataService.addGroup(groupName, ["User1"])
+        dataService.addGroup(groupName, [User(username: "User1")])
         createdGroupName = groupName
         groupName = ""
         isPresented = true

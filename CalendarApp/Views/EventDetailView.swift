@@ -33,6 +33,14 @@ struct EventDetailView: View {
 
             EventDateView(event: event)
 
+            if let assignedTo = event.assignedTo {
+                Text("Assignee")
+                Text(assignedTo.username)
+                    .foregroundColor(.secondary)
+                Divider()
+                    .padding(.bottom)
+            }
+
             if let url = event.url {
                 Text("URL")
                 Link("\(url)", destination: url)
@@ -124,5 +132,5 @@ struct EventDetailView: View {
 }
 
 #Preview {
-    EventDetailView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1))
+    EventDetailView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, assignedTo: User(username: "Turan")))
 }

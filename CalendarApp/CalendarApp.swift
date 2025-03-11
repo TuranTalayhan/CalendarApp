@@ -25,6 +25,7 @@ struct CalendarApp: App {
         let schema = Schema([
             Event.self,
             Group.self,
+            User.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

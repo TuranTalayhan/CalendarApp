@@ -5,10 +5,12 @@
 //  Created by Turan Talayhan on 23/02/2025.
 //
 
+import SwiftData
 import SwiftUI
 
 struct EditEventView: View {
     @Environment(\.modelContext) private var modelContext
+    @Query private var groups: [Group]
     @Binding var isPresented: Bool
     let parentDismiss: DismissAction
     let event: Event
@@ -21,6 +23,7 @@ struct EditEventView: View {
     @State private var showingConfirmation: Bool = false
     @State private var showAlert: Bool = false
     @State private var alert: Int = -1
+    @State private var assignee: String = ""
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -49,6 +52,7 @@ struct EditEventView: View {
         self._url = State(initialValue: event.url?.absoluteString ?? "")
         self._notes = State(initialValue: event.notes ?? "")
         self._alert = State(initialValue: event.alert)
+        self._assignee = State(initialValue: event.assignedTo?.username ?? "")
     }
 
     var body: some View {
@@ -64,19 +68,11 @@ struct EditEventView: View {
                 }
 
                 Section {
-                    Picker("Alert", selection: $alert) {
-                        Text("None").tag(-1)
-                        Text("At time of event").tag(0)
-                        Text("5 minutes before").tag(5)
-                        Text("10 minutes before").tag(10)
-                        Text("15 minutes before").tag(15)
-                        Text("30 minutes before").tag(30)
-                        Text("1 hour before").tag(60)
-                        Text("2 hours before").tag(60 * 2)
-                        Text("1 day before").tag(60 * 24)
-                        Text("2 day before").tag(60 * 24 * 2)
-                        Text("1 week before").tag(60 * 24 * 7)
-                    }
+                    AlertPicker(alert: $alert)
+                }
+
+                Section {
+                    AssigneePicker(groups: groups, assignee: $assignee)
                 }
 
                 Section {
@@ -157,5 +153,5 @@ struct EditEventView: View {
 
 #Preview {
     @Previewable @Environment(\.dismiss) var dismiss: DismissAction
-    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1))
+    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, assignedTo: User(username: "Turan")))
 }
