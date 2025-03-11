@@ -11,6 +11,7 @@ struct CreateGroupView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var groupName: String = ""
     @State private var createdGroupName = ""
+    @State private var invalidName: Bool = false
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -41,10 +42,14 @@ struct CreateGroupView: View {
         .navigationDestination(isPresented: $isPresented) {
             GroupDetailsView(group: Group(name: createdGroupName, members: ["User1"]))
         }
+        .alert(isPresented: $invalidName) {
+            Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
+        }
     }
 
     private func createGroup() {
-        guard !groupName.isEmpty else {
+        guard !groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            invalidName = true
             return
         }
         dataService.addGroup(groupName, ["User1"])
