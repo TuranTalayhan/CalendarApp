@@ -18,6 +18,7 @@ final class Event: Comparable, Identifiable {
     var url: URL?
     var notes: String?
     var alert: Int
+    var timestamp: Date = Date()
 
     init(title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int) {
         self.id = UUID().uuidString
