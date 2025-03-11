@@ -24,9 +24,20 @@ class LocalDataService {
         try? modelContext.save()
     }
 
+    func addGroup(_ name: String, _ members: [User] = []) {
+        let newGroup = Group(name: name, members: members)
+        modelContext.insert(newGroup)
+        try? modelContext.save()
+    }
+
     func deleteEvent(_ event: Event) {
         userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
         modelContext.delete(event)
+        try? modelContext.save()
+    }
+
+    func deleteGroup(_ group: Group) {
+        modelContext.delete(group)
         try? modelContext.save()
     }
 }
