@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GroupsView: View {
+    @State private var showAddGroupView: Bool = false
     let groups: [Group]
 
     var body: some View {
@@ -20,10 +21,13 @@ struct GroupsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem {
-                Button(action: {}) {
+                Button(action: { showAddGroupView = true }) {
                     Label("Add Item", systemImage: "plus")
                 }
             }
+        }
+        .navigationDestination(isPresented: $showAddGroupView) {
+            AddGroupView()
         }
     }
 }
