@@ -26,8 +26,8 @@ struct SettingsView: View {
                     Text("About")
                 }
             }
+            .navigationTitle(Text("Settings"))
         }
-        .navigationTitle(Text("Settings"))
     }
 }
 
