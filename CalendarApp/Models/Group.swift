@@ -12,9 +12,9 @@ import SwiftData
 final class Group: Identifiable {
     var id: String
     var name: String
-    var members: [User]
+    var members: [String]
 
-    init(name: String, members: [User]) {
+    init(name: String, members: [String]) {
         self.id = UUID().uuidString
         self.name = name
         self.members = members

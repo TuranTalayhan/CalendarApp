@@ -5,17 +5,25 @@
 //  Created by Turan Talayhan on 10/03/2025.
 //
 
+import SwiftData
 import SwiftUI
 
 struct GroupsView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query private var groups: [Group]
     @State private var showAddGroupView: Bool = false
-    let groups: [Group]
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
+    }
 
     var body: some View {
         List {
-            NavigationLink(destination: GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Something", password: "Something", email: "Something")]))) {
-                Text("Group 1")
+            ForEach(groups) { group in
+                NavigationLink(destination: GroupDetailsView(group: group)) {
+                    Text(group.name)
+                }
             }
+            .onDelete(perform: deleteGroups)
         }
         .navigationTitle(Text("Groups"))
         .navigationBarTitleDisplayMode(.large)
@@ -30,8 +38,16 @@ struct GroupsView: View {
             AddGroupView()
         }
     }
+
+    private func deleteGroups(offsets: IndexSet) {
+        withAnimation {
+            for index in offsets {
+                dataService.deleteGroup(groups[index])
+            }
+        }
+    }
 }
 
 #Preview {
-    GroupsView(groups: [Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Something", password: "Something", email: "Something")])])
+    GroupsView()
 }

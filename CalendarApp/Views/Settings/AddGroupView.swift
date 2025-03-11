@@ -47,7 +47,7 @@ struct AddGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(id: groupID, name: "", members: []))
+            GroupDetailsView(group: Group(name: "Test", members: ["User1"]))
         }
 
         .navigationDestination(isPresented: $createGroup) {

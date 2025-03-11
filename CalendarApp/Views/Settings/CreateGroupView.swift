@@ -8,7 +8,15 @@
 import SwiftUI
 
 struct CreateGroupView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var groupName: String = ""
+    @State private var createdGroupName = ""
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
+    }
+
+    @State private var isPresented: Bool = false
+
     var body: some View {
         Form {
             Image("Group2")
@@ -20,7 +28,7 @@ struct CreateGroupView: View {
                 TextField("Group Name", text: $groupName)
             }
 
-            Button(action: {}) {
+            Button(action: createGroup) {
                 Text("Create Group")
                     .frame(maxWidth: .infinity)
             }
@@ -30,6 +38,19 @@ struct CreateGroupView: View {
             .controlSize(.large)
             .listRowBackground(Color.clear)
         }
+        .navigationDestination(isPresented: $isPresented) {
+            GroupDetailsView(group: Group(name: createdGroupName, members: ["User1"]))
+        }
+    }
+
+    private func createGroup() {
+        guard !groupName.isEmpty else {
+            return
+        }
+        dataService.addGroup(groupName, ["User1"])
+        createdGroupName = groupName
+        groupName = ""
+        isPresented = true
     }
 }
 

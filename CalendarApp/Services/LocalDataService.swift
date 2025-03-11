@@ -24,7 +24,7 @@ class LocalDataService {
         try? modelContext.save()
     }
 
-    func addGroup(_ name: String, _ members: [User] = []) {
+    func addGroup(_ name: String, _ members: [String]) {
         let newGroup = Group(name: name, members: members)
         modelContext.insert(newGroup)
         try? modelContext.save()

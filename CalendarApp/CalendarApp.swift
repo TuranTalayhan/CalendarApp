@@ -24,6 +24,7 @@ struct CalendarApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Event.self,
+            Group.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

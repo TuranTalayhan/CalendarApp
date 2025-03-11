@@ -21,8 +21,8 @@ struct GroupDetailsView: View {
             }
 
             Section("Members") {
-                ForEach(group.members) { member in
-                    Text(member.username)
+                ForEach(group.members, id: \.self) { member in
+                    Text(member)
                 }
             }
         }
@@ -32,5 +32,5 @@ struct GroupDetailsView: View {
 }
 
 #Preview {
-    GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Member 1", password: "Something", email: "Something"), User(id: UUID().uuidString, username: "Member 2", password: "Something", email: "Something")]))
+    GroupDetailsView(group: Group(name: "Test Group", members: ["User1", "User2", "User3"]))
 }

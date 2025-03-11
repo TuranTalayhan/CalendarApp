@@ -10,7 +10,7 @@ import SwiftUI
 struct UserView: View {
     var body: some View {
         List {
-            NavigationLink(destination: GroupsView(groups: [Group(id: UUID().uuidString, name: "Test Group", members: [User(id: UUID().uuidString, username: "Something", password: "Something", email: "Something")])])) {
+            NavigationLink(destination: GroupsView()) {
                 Text("Groups")
             }
         }
