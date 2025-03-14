@@ -12,34 +12,50 @@ struct GroupDetailsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.presentationMode) private var presentationMode
     @State private var showingConfirmation: Bool = false
+    @State private var showCopiedMessage = false
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
 
     var body: some View {
-        List {
-            Section("Name") {
-                Text(group.name)
-            }
-
-            Section("Group id") {
-                Text(group.id)
-            }
-
-            Section("Members") {
-                ForEach(group.members) { member in
-                    Text(member.username)
+        ZStack {
+            List {
+                Section("Name") {
+                    Text(group.name)
                 }
+
+                Section(header: Text("Group ID"), footer: showCopiedMessage ? Text("Copied")
+                    .foregroundColor(.secondary)
+                    : Text(" "))
+                {
+                    Button(action: {
+                        UIPasteboard.general.string = group.id
+                        showCopiedMessage = true
+
+                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+                            showCopiedMessage = false
+                        }
+                    }) {
+                        Text(group.id)
+                            .foregroundColor(.primary)
+                    }
+                }
+
+                Section("Members") {
+                    ForEach(group.members) { member in
+                        Text(member.username)
+                    }
+                }
+                Button(role: .destructive, action: { showingConfirmation = true }) {
+                    Text("Delete Group")
+                }
+                .confirmationDialog("Are you sure you want to delete this group?", isPresented: $showingConfirmation, titleVisibility: .visible) {
+                    Button("Delete Group", role: .destructive, action: deleteGroup)
+                    Button("Cancel", role: .cancel, action: {})
+                }
+                .frame(maxWidth: .infinity)
+                .foregroundColor(.red)
             }
-            Button(role: .destructive, action: { showingConfirmation = true }) {
-                Text("Delete Group")
-            }
-            .confirmationDialog("Are you sure you want to delete this group?", isPresented: $showingConfirmation, titleVisibility: .visible) {
-                Button("Delete Group", role: .destructive, action: deleteGroup)
-                Button("Cancel", role: .cancel, action: {})
-            }
-            .frame(maxWidth: .infinity)
-            .foregroundColor(.red)
         }
         .navigationTitle(Text("Group details"))
         .navigationBarTitleDisplayMode(.inline)
