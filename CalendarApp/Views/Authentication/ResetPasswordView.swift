@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct ResetPasswordView: View {
+    let firebaseService: FirebaseService
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @State private var email: String = ""
+    @State private var errorAlert: Bool = false
 
     var body: some View {
         Form {
@@ -21,7 +24,7 @@ struct ResetPasswordView: View {
                 TextField("Email", text: $email)
             }
 
-            Button(action: {}) {
+            Button(action: { ResetPassword() }) {
                 Text("Reset Password")
                     .frame(maxWidth: .infinity)
             }
@@ -31,9 +34,27 @@ struct ResetPasswordView: View {
             .controlSize(.large)
             .listRowBackground(Color.clear)
         }
+        .alert(isPresented: $errorAlert) {
+            Alert(title: Text("Email isn't registered"), message: Text("Please check the email or sign up for a new account."))
+        }
+    }
+
+    private func ResetPassword() {
+        guard !email.isEmpty else {
+            errorAlert = true
+            return
+        }
+        firebaseService.ResetPassword(email) { error in
+            if let error = error {
+                print("Login failed: \(error.localizedDescription)")
+                errorAlert = true
+                return
+            }
+            self.presentationMode.wrappedValue.dismiss()
+        }
     }
 }
 
 #Preview {
-    ResetPasswordView()
+    ResetPasswordView(firebaseService: FirebaseService())
 }

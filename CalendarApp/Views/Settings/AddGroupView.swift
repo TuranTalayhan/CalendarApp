@@ -5,12 +5,14 @@
 //  Created by Turan Talayhan on 10/03/2025.
 //
 
+import FirebaseAuth
 import SwiftUI
 
 struct AddGroupView: View {
     @State private var groupID: String = ""
     @State private var joinGroup: Bool = false
     @State private var createGroup: Bool = false
+    private let auth = Auth.auth()
 
     var body: some View {
         Form {
@@ -47,11 +49,11 @@ struct AddGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [User(username: "User1")]))
+            GroupDetailsView(group: Group(name: "Test", members: [User(username: auth.currentUser?.displayName ?? "User")]))
         }
 
         .navigationDestination(isPresented: $createGroup) {
-            CreateGroupView()
+            CreateGroupView(auth: auth)
         }
     }
 }

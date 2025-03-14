@@ -5,6 +5,7 @@
 //  Created by Turan Talayhan on 10/03/2025.
 //
 
+import FirebaseAuth
 import SwiftUI
 
 struct SettingsView: View {
@@ -13,12 +14,11 @@ struct SettingsView: View {
             List {
                 NavigationLink(destination: UserView()) {
                     HStack {
-                        Image("Relaxing")
+                        Image(systemName: "person.circle")
                             .resizable()
-                            .frame(width: 32, height: 32)
-                            .clipShape(Circle())
+                            .frame(width: 25, height: 25)
                             .clipped(antialiased: true)
-                        Text("Username")
+                        Text(Auth.auth().currentUser?.displayName ?? "User")
                     }
                 }
 

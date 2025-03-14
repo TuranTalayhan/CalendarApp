@@ -5,6 +5,7 @@
 //  Created by Turan Talayhan on 10/03/2025.
 //
 
+import FirebaseAuth
 import SwiftUI
 
 struct CreateGroupView: View {
@@ -15,6 +16,8 @@ struct CreateGroupView: View {
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
+
+    let auth: Auth
 
     @State private var isPresented: Bool = false
 
@@ -40,7 +43,7 @@ struct CreateGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $isPresented) {
-            GroupDetailsView(group: Group(name: createdGroupName, members: [User(username: "User1")]))
+            GroupDetailsView(group: Group(name: createdGroupName, members: [User(username: auth.currentUser?.displayName ?? "User")]))
         }
         .alert(isPresented: $invalidName) {
             Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
@@ -52,7 +55,7 @@ struct CreateGroupView: View {
             invalidName = true
             return
         }
-        dataService.addGroup(groupName, [User(username: "User1")])
+        dataService.addGroup(groupName, [User(username: auth.currentUser?.displayName ?? "User")])
         createdGroupName = groupName
         groupName = ""
         isPresented = true
@@ -60,5 +63,5 @@ struct CreateGroupView: View {
 }
 
 #Preview {
-    CreateGroupView()
+    CreateGroupView(auth: FirebaseAuth.Auth.auth())
 }

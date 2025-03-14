@@ -4,11 +4,13 @@
 //
 //  Created by Turan Talayhan on 11/03/2025.
 //
+import FirebaseAuth
 import SwiftUI
 
 struct AssigneePicker: View {
     let groups: [Group]
     @Binding var assignee: String
+    let auth = Auth.auth()
 
     var body: some View {
         Picker("Assignee", selection: $assignee) {
@@ -21,7 +23,7 @@ struct AssigneePicker: View {
             }
 
             if groups.isEmpty {
-                Text("User1").tag("User1")
+                Text(auth.currentUser?.displayName ?? "User").tag(auth.currentUser?.displayName ?? "User")
             }
 
             if assignee != "" {
