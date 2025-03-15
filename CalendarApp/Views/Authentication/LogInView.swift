@@ -12,7 +12,7 @@ struct LogInView: View {
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var errorAlert: Bool = false
-    private let firebaseService = FirebaseService()
+    private let firebaseService = FirebaseService.shared
 
     var body: some View {
         NavigationStack {

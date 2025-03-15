@@ -13,14 +13,10 @@ final class User: Identifiable {
     var id: String
     var username: String
     var email: String?
-    var password: String?
-    var isLocalUser: Bool
 
     init(username: String, email: String? = nil, password: String? = nil, isLocalUser: Bool = false) {
         self.id = UUID().uuidString
         self.username = username
         self.email = email
-        self.password = password
-        self.isLocalUser = isLocalUser
     }
 }

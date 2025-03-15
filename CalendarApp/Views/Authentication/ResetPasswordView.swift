@@ -56,5 +56,5 @@ struct ResetPasswordView: View {
 }
 
 #Preview {
-    ResetPasswordView(firebaseService: FirebaseService())
+    ResetPasswordView(firebaseService: FirebaseService.shared)
 }

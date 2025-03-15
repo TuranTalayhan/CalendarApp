@@ -18,7 +18,7 @@ struct SettingsView: View {
                             .resizable()
                             .frame(width: 25, height: 25)
                             .clipped(antialiased: true)
-                        Text(Auth.auth().currentUser?.displayName ?? "User")
+                        Text(FirebaseService.shared.getCurrentUserDisplayName() ?? "User")
                     }
                 }
 

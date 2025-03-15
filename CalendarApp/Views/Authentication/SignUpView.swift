@@ -67,5 +67,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(isLoggedIn: .constant(false), firebaseService: FirebaseService())
+    SignUpView(isLoggedIn: .constant(false), firebaseService: FirebaseService.shared)
 }

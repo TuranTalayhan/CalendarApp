@@ -9,8 +9,8 @@ import SwiftUI
 
 struct AssigneePicker: View {
     let groups: [Group]
+    let firebaseService = FirebaseService.shared
     @Binding var assignee: String
-    let auth = Auth.auth()
 
     var body: some View {
         Picker("Assignee", selection: $assignee) {
@@ -23,7 +23,7 @@ struct AssigneePicker: View {
             }
 
             if groups.isEmpty {
-                Text(auth.currentUser?.displayName ?? "User").tag(auth.currentUser?.displayName ?? "User")
+                Text(firebaseService.getCurrentUserDisplayName() ?? "User").tag(firebaseService.getCurrentUserDisplayName() ?? "User")
             }
 
             if assignee != "" {

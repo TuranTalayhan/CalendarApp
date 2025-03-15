@@ -8,8 +8,12 @@ import FirebaseAuth
 import FirebaseFirestore
 
 class FirebaseService {
+    static let shared = FirebaseService()
+
     private let auth = Auth.auth()
     private let firestore = Firestore.firestore()
+
+    private init() {}
 
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
         auth.createUser(withEmail: email, password: password) { _, error in
@@ -44,5 +48,9 @@ class FirebaseService {
         auth.sendPasswordReset(withEmail: email) { error in
             completion(error)
         }
+    }
+
+    func getCurrentUserDisplayName() -> String? {
+        return auth.currentUser?.displayName
     }
 }

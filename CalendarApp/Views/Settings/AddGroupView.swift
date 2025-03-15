@@ -12,7 +12,7 @@ struct AddGroupView: View {
     @State private var groupID: String = ""
     @State private var joinGroup: Bool = false
     @State private var createGroup: Bool = false
-    private let auth = Auth.auth()
+    private let firebaseService = FirebaseService.shared
 
     var body: some View {
         Form {
@@ -49,11 +49,11 @@ struct AddGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [User(username: auth.currentUser?.displayName ?? "User")]))
+            GroupDetailsView(group: Group(name: "Test", members: [User(username: firebaseService.getCurrentUserDisplayName() ?? "User")]))
         }
 
         .navigationDestination(isPresented: $createGroup) {
-            CreateGroupView(auth: auth)
+            CreateGroupView()
         }
     }
 }
