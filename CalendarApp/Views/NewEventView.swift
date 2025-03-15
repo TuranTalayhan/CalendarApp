@@ -101,14 +101,16 @@ struct NewEventView: View {
 
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
+            // TODO: replace empty email string
             if !assignee.isEmpty {
-                dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, User(username: assignee))
+                dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, User(username: assignee, email: ""))
             } else {
                 dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, nil)
             }
 
+            // TODO: replace empty email string
             if isNotificationAuthorized && alert >= 0 {
-                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, assignedTo: User(username: assignee)), dateFormatService: dateFormatService, minutesBefore: alert)
+                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, assignedTo: User(username: assignee, email: "")), dateFormatService: dateFormatService, minutesBefore: alert)
             } else if alert >= 0 {
                 Task {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()

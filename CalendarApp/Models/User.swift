@@ -12,10 +12,10 @@ import SwiftData
 final class User: Identifiable {
     var id: String
     var username: String
-    var email: String?
+    var email: String
 
-    init(username: String, email: String? = nil, password: String? = nil, isLocalUser: Bool = false) {
-        self.id = UUID().uuidString
+    init(id: String = UUID().uuidString, username: String, email: String) {
+        self.id = id
         self.username = username
         self.email = email
     }

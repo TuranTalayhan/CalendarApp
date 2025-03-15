@@ -49,7 +49,7 @@ struct AddGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [User(username: firebaseService.getCurrentUserDisplayName() ?? "User")]))
+            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.getCurrentUser()]))
         }
 
         .navigationDestination(isPresented: $createGroup) {

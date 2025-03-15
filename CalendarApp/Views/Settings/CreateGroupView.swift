@@ -41,7 +41,7 @@ struct CreateGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $isPresented) {
-            GroupDetailsView(group: Group(name: createdGroupName, members: [User(username: firebaseService.getCurrentUserDisplayName() ?? "User")]))
+            GroupDetailsView(group: Group(name: createdGroupName, members: [firebaseService.getCurrentUser()]))
         }
         .alert(isPresented: $invalidName) {
             Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
@@ -53,7 +53,7 @@ struct CreateGroupView: View {
             invalidName = true
             return
         }
-        dataService.addGroup(groupName, [User(username: firebaseService.getCurrentUserDisplayName() ?? "User")])
+        dataService.addGroup(groupName, [firebaseService.getCurrentUser()])
         createdGroupName = groupName
         groupName = ""
         isPresented = true

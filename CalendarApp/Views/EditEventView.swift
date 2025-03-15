@@ -153,5 +153,5 @@ struct EditEventView: View {
 
 #Preview {
     @Previewable @Environment(\.dismiss) var dismiss: DismissAction
-    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, assignedTo: User(username: "Turan")))
+    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, assignedTo: User(username: "Turan", email: "turan@gmail.com")))
 }

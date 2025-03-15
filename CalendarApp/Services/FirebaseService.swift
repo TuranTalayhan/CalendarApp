@@ -12,6 +12,7 @@ class FirebaseService {
 
     private let auth = Auth.auth()
     private let firestore = Firestore.firestore()
+    private var currentUser: User?
 
     private init() {}
 
@@ -28,7 +29,18 @@ class FirebaseService {
                     return
                 }
 
-                self.auth.currentUser?.displayName = username
+                let authUser = self.auth.currentUser!
+
+                authUser.displayName = username
+
+                self.currentUser = User(id: authUser.uid, username: username, email: email)
+
+                self.saveUser(self.currentUser!) { error in
+                    if let error = error {
+                        completion(error)
+                        return
+                    }
+                }
                 completion(nil)
             }
         }
@@ -44,13 +56,28 @@ class FirebaseService {
         }
     }
 
+    private func saveUser(_ user: User, completion: @escaping (Error?) -> Void) {
+        let data: [String: Any] = [
+            "username": user.username,
+            "email": user.email
+        ]
+
+        firestore.collection("users").document(user.id).setData(data) { error in
+            if let error = error {
+                completion(error)
+                return
+            }
+            completion(nil)
+        }
+    }
+
     func ResetPassword(_ email: String, completion: @escaping (Error?) -> Void) {
         auth.sendPasswordReset(withEmail: email) { error in
             completion(error)
         }
     }
 
-    func getCurrentUserDisplayName() -> String? {
-        return auth.currentUser?.displayName
+    func getCurrentUser() -> User {
+        return currentUser!
     }
 }

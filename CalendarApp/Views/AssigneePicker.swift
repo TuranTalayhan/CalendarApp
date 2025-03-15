@@ -23,7 +23,7 @@ struct AssigneePicker: View {
             }
 
             if groups.isEmpty {
-                Text(firebaseService.getCurrentUserDisplayName() ?? "User").tag(firebaseService.getCurrentUserDisplayName() ?? "User")
+                Text(firebaseService.getCurrentUser().username).tag(firebaseService.getCurrentUser().username)
             }
 
             if assignee != "" {

@@ -70,5 +70,5 @@ struct GroupDetailsView: View {
 }
 
 #Preview {
-    GroupDetailsView(group: Group(name: "Test Group", members: [User(username: "User1"), User(username: "User2"), User(username: "User3")]))
+    GroupDetailsView(group: Group(name: "Test Group", members: [User(username: "User1", email: "test@test.com"), User(username: "User3", email: "test@test.com"), User(username: "User2", email: "test@test.com"), User(username: "User3", email: "test@test.com")]))
 }
