@@ -8,15 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var isLoggedIn: Bool = false
-    private let firebaseService = FirebaseService.shared
-
-    init() {
-        self.isLoggedIn = firebaseService.getCurrentUser() != nil
-    }
+    @Binding var isLoggedIn: Bool
+    @Binding var hasLoaded: Bool
 
     var body: some View {
-        if !isLoggedIn {
+        if !hasLoaded {
+            ProgressView()
+        } else if !isLoggedIn {
             LogInView(isLoggedIn: $isLoggedIn)
         } else {
             TabView {
@@ -31,7 +29,7 @@ struct ContentView: View {
                         Image(systemName: "calendar")
                         Text("Calendar")
                     }
-                SettingsView()
+                SettingsView(isLoggedIn: $isLoggedIn)
                     .tabItem {
                         Image(systemName: "gearshape")
                         Text("Settings")
@@ -42,5 +40,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(isLoggedIn: .constant(true), hasLoaded: .constant(true))
 }

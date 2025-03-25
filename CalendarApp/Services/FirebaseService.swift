@@ -12,33 +12,38 @@ class FirebaseService {
 
     private let auth = Auth.auth()
     private let firestore = Firestore.firestore()
+    private var handle: AuthStateDidChangeListenerHandle?
 
     private init() {}
 
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
-        auth.createUser(withEmail: email, password: password) { _, error in
+        auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {
                 completion(error)
                 return
             }
 
-            self.LogInWithEmail(email, password) { error in
+            guard let authUser = result?.user else {
+                completion(NSError(domain: "FirebaseService", code: 0, userInfo: [NSLocalizedDescriptionKey: "User not found after registration"]))
+                return
+            }
+
+            let changeRequest = authUser.createProfileChangeRequest()
+            changeRequest.displayName = username
+
+            changeRequest.commitChanges { error in
                 if let error = error {
                     completion(error)
                     return
                 }
 
-                if let authUser = self.auth.currentUser {
-                    authUser.displayName = username
-
-                    self.saveUser(authUser) { error in
-                        if let error = error {
-                            completion(error)
-                            return
-                        }
+                self.saveUser(authUser) { error in
+                    if let error = error {
+                        completion(error)
+                        return
                     }
+                    completion(nil)
                 }
-                completion(nil)
             }
         }
     }
@@ -79,5 +84,29 @@ class FirebaseService {
             return nil
         }
         return User(username: displayName, email: email)
+    }
+
+    func addAuthStateListener(completion: @escaping (User?) -> Void) {
+        handle = auth.addStateDidChangeListener { _, user in
+            if let user = user {
+                completion(User(username: user.displayName ?? "", email: user.email ?? ""))
+            } else {
+                completion(nil)
+            }
+        }
+    }
+
+    func removeAuthStateListener() {
+        if let handle = handle {
+            auth.removeStateDidChangeListener(handle)
+        }
+    }
+
+    func signOut() {
+        do {
+            try auth.signOut()
+        } catch {
+            print("Error signing out: \(error)")
+        }
     }
 }

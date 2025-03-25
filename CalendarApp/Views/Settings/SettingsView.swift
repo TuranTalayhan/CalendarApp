@@ -9,10 +9,11 @@ import FirebaseAuth
 import SwiftUI
 
 struct SettingsView: View {
+    @Binding var isLoggedIn: Bool
     var body: some View {
         NavigationStack {
             List {
-                NavigationLink(destination: UserView()) {
+                NavigationLink(destination: UserView(isLoggedIn: $isLoggedIn)) {
                     HStack {
                         Image(systemName: "person.circle")
                             .resizable()
@@ -33,5 +34,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(isLoggedIn: .constant(true))
 }

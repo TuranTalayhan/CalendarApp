@@ -8,15 +8,33 @@
 import SwiftUI
 
 struct UserView: View {
+    @Binding var isLoggedIn: Bool
+    @State private var alert: Bool = false
+    private let firebaseService = FirebaseService.shared
+
     var body: some View {
         List {
             NavigationLink(destination: GroupsView()) {
                 Text("Groups")
             }
+            Button(action: {
+                alert = true
+            }) {
+                Text("Log out")
+            }
+            .foregroundStyle(.red)
         }
+        .alert("Are you sure you want to log out?", isPresented: $alert, actions: {
+            Button("Log out", role: .destructive) { LogOut() }
+        })
+    }
+
+    private func LogOut() {
+        firebaseService.signOut()
+        isLoggedIn = false
     }
 }
 
 #Preview {
-    UserView()
+    UserView(isLoggedIn: .constant(true))
 }
