@@ -23,7 +23,8 @@ struct AssigneePicker: View {
             }
 
             if groups.isEmpty {
-                Text(firebaseService.getCurrentUser().username).tag(firebaseService.getCurrentUser().username)
+                // TODO: HANDLE NILABLE USER
+                Text(firebaseService.getCurrentUser()?.username ?? "Failed").tag(firebaseService.getCurrentUser()?.username ?? "Failed")
             }
 
             if assignee != "" {

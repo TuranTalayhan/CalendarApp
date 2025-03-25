@@ -9,6 +9,11 @@ import SwiftUI
 
 struct ContentView: View {
     @State var isLoggedIn: Bool = false
+    private let firebaseService = FirebaseService.shared
+
+    init() {
+        self.isLoggedIn = firebaseService.getCurrentUser() != nil
+    }
 
     var body: some View {
         if !isLoggedIn {

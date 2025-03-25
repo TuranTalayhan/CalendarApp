@@ -18,7 +18,8 @@ struct SettingsView: View {
                             .resizable()
                             .frame(width: 25, height: 25)
                             .clipped(antialiased: true)
-                        Text(FirebaseService.shared.getCurrentUser().username)
+                        // TODO: HANDLE NILABLE USER
+                        Text(FirebaseService.shared.getCurrentUser()?.username ?? "Failed")
                     }
                 }
 

@@ -48,8 +48,9 @@ struct AddGroupView: View {
             .controlSize(.large)
             .listRowBackground(Color.clear)
         }
+        // TODO: HANDLE NILABLE USER
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.getCurrentUser()]))
+            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.getCurrentUser() ?? User(username: "failed", email: "failed@gmail.com")]))
         }
 
         .navigationDestination(isPresented: $createGroup) {
