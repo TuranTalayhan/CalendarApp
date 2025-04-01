@@ -22,6 +22,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct CalendarApp: App {
     @State var isLoggedIn = false
     @State var hasLoaded = false
+    private let firebaseService = FirebaseService.shared
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -42,14 +43,14 @@ struct CalendarApp: App {
         WindowGroup {
             ContentView(isLoggedIn: $isLoggedIn, hasLoaded: $hasLoaded)
                 .onAppear {
-                    FirebaseService.shared.addAuthStateListener { user in
-                        FirebaseService.shared.currentUser = user
+                    firebaseService.addAuthStateListener { user in
+                        firebaseService.currentUser = user
                         isLoggedIn = user != nil
                         hasLoaded = true
                     }
                 }
                 .onDisappear {
-                    FirebaseService.shared.removeAuthStateListener()
+                    firebaseService.removeAuthStateListener()
                 }
         }
         .modelContainer(sharedModelContainer)
