@@ -43,12 +43,8 @@ struct CalendarApp: App {
             ContentView(isLoggedIn: $isLoggedIn, hasLoaded: $hasLoaded)
                 .onAppear {
                     FirebaseService.shared.addAuthStateListener { user in
-                        if user != nil {
-                            print(user?.email ?? "No user")
-                            isLoggedIn = true
-                        } else {
-                            isLoggedIn = false
-                        }
+                        FirebaseService.shared.currentUser = user
+                        isLoggedIn = user != nil
                         hasLoaded = true
                     }
                 }

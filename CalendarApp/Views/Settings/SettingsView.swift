@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Binding var isLoggedIn: Bool
+    var firebaseService: FirebaseService = .shared
     var body: some View {
         NavigationStack {
             List {
@@ -20,7 +21,7 @@ struct SettingsView: View {
                             .frame(width: 25, height: 25)
                             .clipped(antialiased: true)
                         // TODO: HANDLE NILABLE USER
-                        Text(FirebaseService.shared.getCurrentUser()?.username ?? "Failed")
+                        Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser?.username ?? "Failed")
                     }
                 }
 

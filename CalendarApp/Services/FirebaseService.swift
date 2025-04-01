@@ -13,6 +13,7 @@ class FirebaseService {
     private let auth = Auth.auth()
     private let firestore = Firestore.firestore()
     private var handle: AuthStateDidChangeListenerHandle?
+    public var currentUser: User?
 
     private init() {}
 
@@ -36,8 +37,7 @@ class FirebaseService {
                     completion(error)
                     return
                 }
-
-                self.saveUser(authUser) { error in
+                self.saveUser(authUser, username: username) { error in
                     if let error = error {
                         completion(error)
                         return
@@ -45,6 +45,8 @@ class FirebaseService {
                     completion(nil)
                 }
             }
+
+            self.currentUser = User(username: username, email: email)
         }
     }
 
@@ -54,13 +56,15 @@ class FirebaseService {
                 completion(error)
                 return
             }
+            let user = User(username: self.getCurrentUser()?.username ?? "", email: self.getCurrentUser()?.email ?? "")
+            self.currentUser = user
             completion(nil)
         }
     }
 
-    private func saveUser(_ user: FirebaseAuth.User, completion: @escaping (Error?) -> Void) {
+    private func saveUser(_ user: FirebaseAuth.User, username: String, completion: @escaping (Error?) -> Void) {
         let data: [String: Any] = [
-            "username": user.displayName as Any,
+            "username": username,
             "email": user.email as Any
         ]
 
@@ -88,8 +92,8 @@ class FirebaseService {
 
     func addAuthStateListener(completion: @escaping (User?) -> Void) {
         handle = auth.addStateDidChangeListener { _, user in
-            if let user = user {
-                completion(User(username: user.displayName ?? "", email: user.email ?? ""))
+            if let user = user, let username = user.displayName, let email = user.email {
+                completion(User(username: username, email: email))
             } else {
                 completion(nil)
             }
