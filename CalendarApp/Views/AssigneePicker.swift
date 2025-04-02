@@ -8,32 +8,31 @@ import FirebaseAuth
 import SwiftUI
 
 struct AssigneePicker: View {
-    let groups: [Group]
+    let group: Group?
     let firebaseService = FirebaseService.shared
-    @Binding var assignee: String
+    @Binding var assignee: User?
 
     var body: some View {
         Picker("Assignee", selection: $assignee) {
-            Text("None").tag("")
-            ForEach(groups) { group in
+            Text("None").tag(nil as User?)
+
+            if let group = group {
                 // TODO: Make each selectable member unique
                 ForEach(group.members) { member in
-                    Text(member.username).tag(member.username)
+                    Text(member.username).tag(member)
                 }
-            }
-
-            if groups.isEmpty {
+            } else {
                 // TODO: HANDLE NILABLE USER
                 Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser?.username ?? "Failed")
             }
 
-            if assignee != "" {
-                Text(assignee).tag(assignee)
+            if let assignee = assignee {
+                Text(assignee.username).tag(assignee)
             }
         }
     }
 }
 
 #Preview {
-    AssigneePicker(groups: [], assignee: .constant(""))
+    AssigneePicker(group: nil, assignee: .constant(User(username: "username", email: "email")))
 }

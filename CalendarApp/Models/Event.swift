@@ -18,10 +18,11 @@ final class Event: Comparable, Identifiable {
     var url: URL?
     var notes: String?
     var alert: Int
+    var group: Group?
     var assignedTo: User?
     var timestamp: Date = Date()
 
-    init(title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, assignedTo: User?) {
+    init(title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, group: Group?, assignedTo: User?) {
         self.id = UUID().uuidString
         self.title = title
         self.allDay = allDay
@@ -30,6 +31,7 @@ final class Event: Comparable, Identifiable {
         self.url = url
         self.notes = notes
         self.alert = alert
+        self.group = group
         self.assignedTo = assignedTo
     }
 

@@ -21,7 +21,8 @@ struct NewEventView: View {
     @State private var notes: String = ""
     @State private var showInvalidDatesAlert: Bool = false
     @State private var alert: Int = -1
-    @State private var assignee: String = ""
+    @State private var assignee: User?
+    @State private var selectedGroup: Group?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -52,7 +53,8 @@ struct NewEventView: View {
                 }
 
                 Section {
-                    AssigneePicker(groups: groups, assignee: $assignee)
+                    GroupPicker(groups: groups, selectedGroup: $selectedGroup)
+                    AssigneePicker(group: selectedGroup, assignee: $assignee)
                 }
 
                 Section {
@@ -101,16 +103,10 @@ struct NewEventView: View {
 
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
-            // TODO: replace empty email string
-            if !assignee.isEmpty {
-                dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, User(username: assignee, email: ""))
-            } else {
-                dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, nil)
-            }
+            dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, selectedGroup, assignee)
 
-            // TODO: replace empty email string
             if isNotificationAuthorized && alert >= 0 {
-                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, assignedTo: User(username: assignee, email: "")), dateFormatService: dateFormatService, minutesBefore: alert)
+                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, group: selectedGroup, assignedTo: assignee), dateFormatService: dateFormatService, minutesBefore: alert)
             } else if alert >= 0 {
                 Task {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()

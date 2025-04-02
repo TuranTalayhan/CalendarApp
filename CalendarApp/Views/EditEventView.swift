@@ -23,7 +23,8 @@ struct EditEventView: View {
     @State private var showingConfirmation: Bool = false
     @State private var showAlert: Bool = false
     @State private var alert: Int = -1
-    @State private var assignee: String = ""
+    @State private var assignee: User?
+    @State private var selectedGroup: Group?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -52,7 +53,8 @@ struct EditEventView: View {
         self._url = State(initialValue: event.url?.absoluteString ?? "")
         self._notes = State(initialValue: event.notes ?? "")
         self._alert = State(initialValue: event.alert)
-        self._assignee = State(initialValue: event.assignedTo?.username ?? "")
+        self._assignee = State(initialValue: event.assignedTo)
+        self._selectedGroup = State(initialValue: event.group)
     }
 
     var body: some View {
@@ -72,7 +74,8 @@ struct EditEventView: View {
                 }
 
                 Section {
-                    AssigneePicker(groups: groups, assignee: $assignee)
+                    GroupPicker(groups: groups, selectedGroup: $selectedGroup)
+                    AssigneePicker(group: selectedGroup, assignee: $assignee)
                 }
 
                 Section {
@@ -153,5 +156,5 @@ struct EditEventView: View {
 
 #Preview {
     @Previewable @Environment(\.dismiss) var dismiss: DismissAction
-    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, assignedTo: User(username: "Turan", email: "turan@gmail.com")))
+    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(name: "group name", members: []), assignedTo: User(username: "Turan", email: "turan@gmail.com")))
 }

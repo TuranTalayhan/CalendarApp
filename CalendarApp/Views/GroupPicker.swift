@@ -8,11 +8,19 @@
 import SwiftUI
 
 struct GroupPicker: View {
+    let groups: [Group]
+    @Binding var selectedGroup: Group?
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Picker("Group", selection: $selectedGroup) {
+            Text("None").tag(nil as Group?)
+            ForEach(groups) { group in
+                Text(group.name).tag(group)
+            }
+        }
     }
 }
 
 #Preview {
-    GroupPicker()
+    GroupPicker(groups: [Group(name: "Group Name", members: [])], selectedGroup: .constant(Group(name: "Group Name", members: [])))
 }
