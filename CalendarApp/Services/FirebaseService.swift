@@ -33,11 +33,11 @@ class FirebaseService {
         if let assignedToId = event.assignedTo?.id { data["assignedTo"] = assignedToId }
 
         if let group = event.group {
-            firestore.collection(group.id).document(event.id).setData(data)
+            firestore.collection("groups").document(group.id).collection("events").document(event.id).setData(data)
         } else if let assignedTo = event.assignedTo {
-            firestore.collection(assignedTo.id).document(event.id).setData(data)
+            firestore.collection("users").document(assignedTo.id).collection("events").document(event.id).setData(data)
         } else if let currentUser = currentUser {
-            firestore.collection(currentUser.id).document(event.id).setData(data)
+            firestore.collection("users").document(currentUser.id).collection("events").document(event.id).setData(data)
         } else {
             print("error saving event")
         }
@@ -45,11 +45,11 @@ class FirebaseService {
 
     func deleteEvent(_ event: Event) {
         if let group = event.group {
-            firestore.collection(group.id).document(event.id).delete()
+            firestore.collection("groups").document(group.id).collection("events").document(event.id).delete()
         } else if let assignedTo = event.assignedTo {
-            firestore.collection(assignedTo.id).document(event.id).delete()
+            firestore.collection("users").document(assignedTo.id).collection("events").document(event.id).delete()
         } else if let currentUser = currentUser {
-            firestore.collection(currentUser.id).document(event.id).delete()
+            firestore.collection("users").document(currentUser.id).collection("events").document(event.id).delete()
         }
     }
 

@@ -23,7 +23,7 @@ struct AssigneePicker: View {
                 }
             } else {
                 // TODO: HANDLE NILABLE USER
-                Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser?.username ?? "Failed")
+                Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser as User?)
             }
 
             if let assignee = assignee {
