@@ -17,6 +17,32 @@ class FirebaseService {
 
     private init() {}
 
+    func saveEvent(_ event: Event) {
+        var data: [String: Any] = [
+            "name": event.title,
+            "allDay": event.allDay,
+            "startDate": event.startDate,
+            "endDate": event.endDate,
+            "alert": event.alert,
+            "timestamp": event.timestamp,
+        ]
+
+        if let url = event.url?.absoluteString { data["url"] = url }
+        if let notes = event.notes { data["notes"] = notes }
+        if let groupId = event.group?.id { data["group"] = groupId }
+        if let assignedToId = event.assignedTo?.id { data["assignedTo"] = assignedToId }
+
+        if let group = event.group {
+            firestore.collection(group.id).document(event.id).setData(data)
+        } else if let assignedTo = event.assignedTo {
+            firestore.collection(assignedTo.id).document(event.id).setData(data)
+        } else if let currentUser = currentUser {
+            firestore.collection(currentUser.id).document(event.id).setData(data)
+        } else {
+            print("error saving event")
+        }
+    }
+
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
         auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {
@@ -65,7 +91,7 @@ class FirebaseService {
     private func saveUser(_ user: FirebaseAuth.User, username: String, completion: @escaping (Error?) -> Void) {
         let data: [String: Any] = [
             "username": username,
-            "email": user.email as Any
+            "email": user.email as Any,
         ]
 
         firestore.collection("users").document(user.uid).setData(data) { error in
