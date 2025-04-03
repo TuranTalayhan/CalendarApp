@@ -43,6 +43,16 @@ class FirebaseService {
         }
     }
 
+    func deleteEvent(_ event: Event) {
+        if let group = event.group {
+            firestore.collection(group.id).document(event.id).delete()
+        } else if let assignedTo = event.assignedTo {
+            firestore.collection(assignedTo.id).document(event.id).delete()
+        } else if let currentUser = currentUser {
+            firestore.collection(currentUser.id).document(event.id).delete()
+        }
+    }
+
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
         auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {

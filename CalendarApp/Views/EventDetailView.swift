@@ -125,6 +125,7 @@ struct EventDetailView: View {
 
     private func deleteEvent() {
         withAnimation {
+            FirebaseService.shared.deleteEvent(event)
             dataService.deleteEvent(event)
             self.presentationMode.wrappedValue.dismiss()
         }

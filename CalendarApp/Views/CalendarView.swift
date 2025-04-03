@@ -70,6 +70,7 @@ struct CalendarView: View {
     private func deleteEvents(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
+                FirebaseService.shared.deleteEvent(currentEvents[index])
                 dataService.deleteEvent(currentEvents[index])
             }
         }

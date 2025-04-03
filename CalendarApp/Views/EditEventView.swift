@@ -147,6 +147,7 @@ struct EditEventView: View {
 
     private func deleteEvent() {
         withAnimation {
+            FirebaseService.shared.deleteEvent(event)
             dataService.deleteEvent(event)
             isPresented = false
             parentDismiss()

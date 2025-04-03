@@ -43,6 +43,7 @@ struct EventsView: View {
     private func deleteEvents(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
+                FirebaseService.shared.deleteEvent(selectedEvents[index])
                 dataService.deleteEvent(selectedEvents[index])
             }
         }
