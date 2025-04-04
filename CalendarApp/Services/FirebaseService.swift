@@ -82,7 +82,7 @@ class FirebaseService {
                 }
             }
 
-            self.currentUser = User(username: username, email: email)
+            self.currentUser = User(id: self.currentUser?.id ?? UUID().uuidString, username: username, email: email)
         }
     }
 
@@ -92,7 +92,7 @@ class FirebaseService {
                 completion(error)
                 return
             }
-            let user = User(username: self.getCurrentUser()?.username ?? "", email: self.getCurrentUser()?.email ?? "")
+            let user = User(id: self.getCurrentUser()?.id ?? UUID().uuidString, username: self.getCurrentUser()?.username ?? "", email: self.getCurrentUser()?.email ?? "")
             self.currentUser = user
             completion(nil)
         }
@@ -123,13 +123,13 @@ class FirebaseService {
         guard let user = auth.currentUser, let displayName = user.displayName, let email = user.email else {
             return nil
         }
-        return User(username: displayName, email: email)
+        return User(id: user.uid, username: displayName, email: email)
     }
 
     func addAuthStateListener(completion: @escaping (User?) -> Void) {
         handle = auth.addStateDidChangeListener { _, user in
             if let user = user, let username = user.displayName, let email = user.email {
-                completion(User(username: username, email: email))
+                completion(User(id: user.uid, username: username, email: email))
             } else {
                 completion(nil)
             }

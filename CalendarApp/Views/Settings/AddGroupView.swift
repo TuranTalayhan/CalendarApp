@@ -50,7 +50,7 @@ struct AddGroupView: View {
         }
         // TODO: HANDLE NILABLE USER
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.currentUser ?? User(username: "failed", email: "failed@gmail.com")]))
+            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
         }
 
         .navigationDestination(isPresented: $createGroup) {

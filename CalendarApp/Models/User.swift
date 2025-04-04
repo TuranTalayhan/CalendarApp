@@ -14,7 +14,7 @@ final class User: Identifiable {
     var username: String
     var email: String
 
-    init(id: String = UUID().uuidString, username: String, email: String) {
+    init(id: String, username: String, email: String) {
         self.id = id
         self.username = username
         self.email = email

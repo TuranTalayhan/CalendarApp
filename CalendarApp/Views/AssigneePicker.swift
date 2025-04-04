@@ -34,5 +34,5 @@ struct AssigneePicker: View {
 }
 
 #Preview {
-    AssigneePicker(group: nil, assignee: .constant(User(username: "username", email: "email")))
+    AssigneePicker(group: nil, assignee: .constant(User(id: "id5", username: "username", email: "email")))
 }
