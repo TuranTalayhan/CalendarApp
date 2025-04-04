@@ -49,8 +49,9 @@ struct AddGroupView: View {
             .listRowBackground(Color.clear)
         }
         // TODO: HANDLE NILABLE USER
+        // TODO: ADD ABILITY TO JOIN A GROUP
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(name: "Test", members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
+            GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test", members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
         }
 
         .navigationDestination(isPresented: $createGroup) {

@@ -37,5 +37,5 @@ struct EventDateView: View {
 }
 
 #Preview {
-    EventDateView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(name: "group name", members: []), assignedTo: User(id: "id1", username: "Turan", email: "turan@gmail.com")))
+    EventDateView(event: Event(title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(id: UUID().uuidString, name: "group name", members: []), assignedTo: User(id: "id1", username: "Turan", email: "turan@gmail.com")))
 }

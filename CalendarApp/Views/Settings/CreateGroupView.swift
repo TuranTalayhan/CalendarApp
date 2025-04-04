@@ -10,6 +10,7 @@ struct CreateGroupView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var groupName: String = ""
     @State private var createdGroupName = ""
+    @State private var createdGroupId: String = ""
     @State private var invalidName: Bool = false
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
@@ -42,7 +43,7 @@ struct CreateGroupView: View {
         }
         .navigationDestination(isPresented: $isPresented) {
             // TODO: HANDLE NILABLE USER
-            GroupDetailsView(group: Group(name: createdGroupName, members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
+            GroupDetailsView(group: Group(id: createdGroupId, name: createdGroupName, members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
         }
         .alert(isPresented: $invalidName) {
             Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
@@ -54,8 +55,9 @@ struct CreateGroupView: View {
             invalidName = true
             return
         }
+        createdGroupId = UUID().uuidString
         // TODO: HANDLE NILABLE USER
-        dataService.addGroup(groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
+        dataService.addGroup(createdGroupId, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
         createdGroupName = groupName
         groupName = ""
         isPresented = true

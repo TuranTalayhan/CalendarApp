@@ -22,5 +22,5 @@ struct GroupPicker: View {
 }
 
 #Preview {
-    GroupPicker(groups: [Group(name: "Group Name", members: [])], selectedGroup: .constant(Group(name: "Group Name", members: [])))
+    GroupPicker(groups: [Group(id: UUID().uuidString, name: "Group Name", members: [])], selectedGroup: .constant(Group(id: UUID().uuidString, name: "Group Name", members: [])))
 }

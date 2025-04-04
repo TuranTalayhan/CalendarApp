@@ -70,5 +70,5 @@ struct GroupDetailsView: View {
 }
 
 #Preview {
-    GroupDetailsView(group: Group(name: "Test Group", members: [User(id: "id1", username: "User1", email: "test@test.com"), User(id: "id2", username: "User3", email: "test@test.com"), User(id: "id3", username: "User2", email: "test@test.com"), User(id: "id4", username: "User3", email: "test@test.com")]))
+    GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: "id1", username: "User1", email: "test@test.com"), User(id: "id2", username: "User3", email: "test@test.com"), User(id: "id3", username: "User2", email: "test@test.com"), User(id: "id4", username: "User3", email: "test@test.com")]))
 }

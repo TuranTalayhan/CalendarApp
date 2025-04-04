@@ -15,8 +15,8 @@ final class Group: Identifiable {
     var members: [User]
     var timeStamp: Date = Date()
 
-    init(name: String, members: [User]) {
-        self.id = UUID().uuidString
+    init(id: String, name: String, members: [User]) {
+        self.id = id
         self.name = name
         self.members = members
     }
