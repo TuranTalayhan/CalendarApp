@@ -103,12 +103,12 @@ struct NewEventView: View {
 
     private func addEvent(title: String, isAllDay: Bool, startDate: Date, endDate: Date, url: URL?, notes: String?) {
         withAnimation {
-            let event = dataService.addEvent(title, isAllDay, startDate, endDate, url, notes, alert, selectedGroup, assignee)
+            let event = dataService.addEvent(UUID().uuidString, title, isAllDay, startDate, endDate, url, notes, alert, selectedGroup, assignee)
 
             FirebaseService.shared.saveEvent(event)
 
             if isNotificationAuthorized && alert >= 0 {
-                userNotificationService.sendNotification(Event(title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, group: selectedGroup, assignedTo: assignee), dateFormatService: dateFormatService, minutesBefore: alert)
+                userNotificationService.sendNotification(event, dateFormatService: dateFormatService, minutesBefore: alert)
             } else if alert >= 0 {
                 Task {
                     isNotificationAuthorized = await userNotificationService.requestNotificationAuthorization()

@@ -22,8 +22,8 @@ final class Event: Comparable, Identifiable {
     var assignedTo: User?
     var timestamp: Date = Date()
 
-    init(title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, group: Group?, assignedTo: User?) {
-        self.id = UUID().uuidString
+    init(id: String, title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, group: Group?, assignedTo: User?) {
+        self.id = id
         self.title = title
         self.allDay = allDay
         self.startDate = startTime
