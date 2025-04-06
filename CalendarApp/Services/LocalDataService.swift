@@ -25,10 +25,11 @@ class LocalDataService {
         return newEvent
     }
 
-    func addGroup(_ id: String, _ name: String, _ members: [User]) {
+    func addGroup(_ id: String, _ name: String, _ members: [User]) -> Group {
         let newGroup = Group(id: id, name: name, members: members)
         modelContext.insert(newGroup)
         try? modelContext.save()
+        return newGroup
     }
 
     func deleteEvent(_ event: Event) {

@@ -53,6 +53,21 @@ class FirebaseService {
         }
     }
 
+    func saveGroup(_ group: Group) {
+        var data: [String: Any] = [
+            "id": group.id,
+            "name": group.name,
+            "members": group.members.map(\.id),
+            "timeStamp": group.timeStamp,
+        ]
+
+        firestore.collection("groups").document(group.id).setData(data)
+    }
+
+    func deleteGroup(id: String) {
+        firestore.collection("groups").document(id).delete()
+    }
+
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
         auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {

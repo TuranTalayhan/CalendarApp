@@ -57,7 +57,8 @@ struct CreateGroupView: View {
         }
         createdGroupId = UUID().uuidString
         // TODO: HANDLE NILABLE USER
-        dataService.addGroup(createdGroupId, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
+        let group = dataService.addGroup(createdGroupId, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
+        FirebaseService.shared.saveGroup(group)
         createdGroupName = groupName
         groupName = ""
         isPresented = true
