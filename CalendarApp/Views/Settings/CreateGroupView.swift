@@ -9,9 +9,8 @@ import SwiftUI
 struct CreateGroupView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var groupName: String = ""
-    @State private var createdGroupName = ""
-    @State private var createdGroupId: String = ""
     @State private var invalidName: Bool = false
+    @State private var createdGroup: Group?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -42,8 +41,8 @@ struct CreateGroupView: View {
             .listRowBackground(Color.clear)
         }
         .navigationDestination(isPresented: $isPresented) {
-            // TODO: HANDLE NILABLE USER
-            GroupDetailsView(group: Group(id: createdGroupId, name: createdGroupName, members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
+            // TODO: HANDLE NILABLE GROUP
+            GroupDetailsView(group: createdGroup ?? Group(id: UUID().uuidString, name: "failed", members: []))
         }
         .alert(isPresented: $invalidName) {
             Alert(title: Text("Error"), message: Text("Group name cannot be empty"))
@@ -55,11 +54,11 @@ struct CreateGroupView: View {
             invalidName = true
             return
         }
-        createdGroupId = UUID().uuidString
         // TODO: HANDLE NILABLE USER
-        let group = dataService.addGroup(createdGroupId, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
-        FirebaseService.shared.saveGroup(group)
-        createdGroupName = groupName
+        createdGroup = dataService.addGroup(UUID().uuidString, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
+
+        // TODO: HANDLE NILABLE GROUP
+        FirebaseService.shared.saveGroup(createdGroup ?? Group(id: UUID().uuidString, name: "failed", members: []))
         groupName = ""
         isPresented = true
     }
