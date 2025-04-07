@@ -54,7 +54,7 @@ class FirebaseService {
     }
 
     func saveGroup(_ group: Group) {
-        var data: [String: Any] = [
+        let data: [String: Any] = [
             "id": group.id,
             "name": group.name,
             "members": group.members.map(\.id),
