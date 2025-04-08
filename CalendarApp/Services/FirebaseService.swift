@@ -68,6 +68,52 @@ class FirebaseService {
         firestore.collection("groups").document(id).delete()
     }
 
+    func fetchGroup(id: String) async -> Group? {
+        do {
+            let docSnapshot = try await firestore.collection("groups").document(id).getDocument()
+            guard let data = docSnapshot.data(),
+                  let name = data["name"] as? String,
+                  let memberIDs = data["members"] as? [String],
+                  let timestamp = data["timeStamp"] as? Timestamp
+            else {
+                return nil
+            }
+
+            let members = try await fetchUsers(withIDs: memberIDs)
+
+            let group = Group(id: id, name: name, members: members)
+            group.timeStamp = timestamp.dateValue()
+            return group
+
+        } catch {
+            print("Failed to get group:", error)
+            return nil
+        }
+    }
+
+    func fetchUsers(withIDs IDs: [String]) async throws -> [User] {
+        guard !IDs.isEmpty else {
+            return []
+        }
+        var users: [User] = []
+        let chunkedIDs = stride(from: 0, to: IDs.count, by: 10).map {
+            Array(IDs[$0 ..< min($0 + 10, IDs.count)])
+        }
+
+        for chunk in chunkedIDs {
+            let userSnapshots = try await firestore.collection("users").whereField(FieldPath.documentID(), in: chunk).getDocuments()
+
+            for document in userSnapshots.documents {
+                let data = document.data()
+                if let username = data["username"] as? String, let email = data["email"] as? String {
+                    let user = User(id: document.documentID, username: username, email: email)
+                    users.append(user)
+                }
+            }
+        }
+        return users
+    }
+
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
         auth.createUser(withEmail: email, password: password) { result, error in
             if let error = error {

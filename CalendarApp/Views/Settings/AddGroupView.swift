@@ -9,10 +9,16 @@ import FirebaseAuth
 import SwiftUI
 
 struct AddGroupView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var groupID: String = ""
     @State private var joinGroup: Bool = false
     @State private var createGroup: Bool = false
     private let firebaseService = FirebaseService.shared
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
+    }
+
+    @State private var group: Group?
 
     var body: some View {
         Form {
@@ -28,7 +34,7 @@ struct AddGroupView: View {
             Section {
                 TextField("Group ID", text: $groupID)
             }
-            Button(action: { joinGroup = true }) {
+            Button(action: { Task { await addGroup() }}) {
                 Text("Join group")
                     .frame(maxWidth: .infinity)
             }
@@ -48,15 +54,23 @@ struct AddGroupView: View {
             .controlSize(.large)
             .listRowBackground(Color.clear)
         }
-        // TODO: HANDLE NILABLE USER
-        // TODO: ADD ABILITY TO JOIN A GROUP
+        // TODO: HANDLE NILABLE GROUP
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test", members: [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")]))
+            GroupDetailsView(group: group ?? Group(id: "Test", name: "test", members: []))
         }
 
         .navigationDestination(isPresented: $createGroup) {
             CreateGroupView()
         }
+    }
+
+    private func addGroup() async {
+        guard !groupID.isEmpty else { return }
+        group = await firebaseService.fetchGroup(id: groupID)
+        if let group = group {
+            dataService.addGroup(group.id, group.name, group.members)
+        }
+        joinGroup = true
     }
 }
 
