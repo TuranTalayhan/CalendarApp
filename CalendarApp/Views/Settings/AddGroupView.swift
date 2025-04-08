@@ -4,8 +4,6 @@
 //
 //  Created by Turan Talayhan on 10/03/2025.
 //
-
-import FirebaseAuth
 import SwiftUI
 
 struct AddGroupView: View {
@@ -56,7 +54,7 @@ struct AddGroupView: View {
         }
         // TODO: HANDLE NILABLE GROUP
         .navigationDestination(isPresented: $joinGroup) {
-            GroupDetailsView(group: group ?? Group(id: "Test", name: "test", members: []))
+            GroupDetailsView(group: group ?? Group(id: "Error", name: "Error", members: []))
         }
 
         .navigationDestination(isPresented: $createGroup) {
@@ -67,10 +65,11 @@ struct AddGroupView: View {
     private func addGroup() async {
         guard !groupID.isEmpty else { return }
         group = await firebaseService.fetchGroup(id: groupID)
-        if let group = group {
-            dataService.addGroup(group.id, group.name, group.members)
+        if let newGroup = group {
+            // newGroup.members += [firebaseService.currentUser?.id ?? "Error"]
+            group = dataService.addGroup(newGroup.id, newGroup.name, newGroup.members)
+            joinGroup = true
         }
-        joinGroup = true
     }
 }
 
