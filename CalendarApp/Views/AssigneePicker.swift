@@ -11,24 +11,32 @@ struct AssigneePicker: View {
     let group: Group?
     let firebaseService = FirebaseService.shared
     @Binding var assignee: User?
+    @State private var members: [User]?
 
     var body: some View {
-        Picker("Assignee", selection: $assignee) {
-            Text("None").tag(nil as User?)
+        if let members = members {
+            Picker("Assignee", selection: $assignee) {
+                Text("None").tag(nil as User?)
 
-            if let group = group {
-                // TODO: Make each selectable member unique
-                ForEach(group.members) { member in
-                    Text(member.username).tag(member)
+                if !members.isEmpty {
+                    ForEach(members) { member in
+                        Text(member.username).tag(member)
+                    }
+                } else {
+                    // TODO: HANDLE NILABLE USER
+                    Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser as User?)
                 }
-            } else {
-                // TODO: HANDLE NILABLE USER
-                Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser as User?)
-            }
 
-            if let assignee = assignee {
-                Text(assignee.username).tag(assignee)
+                if let assignee = assignee {
+                    Text(assignee.username).tag(assignee)
+                }
             }
+        } else {
+            ProgressView()
+                .task {
+                    // TODO: ADD ERROR HANDLING
+                    members = try? await FirebaseService.shared.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
+                }
         }
     }
 }

@@ -17,48 +17,60 @@ struct GroupDetailsView: View {
         LocalDataService(context: modelContext)
     }
 
+    @State private var members: [User]?
+
     var body: some View {
-        ZStack {
-            List {
-                Section("Name") {
-                    Text(group.name)
-                }
+        if let members = members {
+            ZStack {
+                List {
+                    Section("Name") {
+                        Text(group.name)
+                    }
 
-                Section(header: Text("Group ID"), footer: showCopiedMessage ? Text("Copied")
-                    .foregroundColor(.secondary)
-                    : Text(" "))
-                {
-                    Button(action: {
-                        UIPasteboard.general.string = group.id
-                        showCopiedMessage = true
+                    Section(header: Text("Group ID"), footer: showCopiedMessage ? Text("Copied")
+                        .foregroundColor(.secondary)
+                        : Text(" "))
+                    {
+                        Button(action: {
+                            UIPasteboard.general.string = group.id
+                            showCopiedMessage = true
 
-                        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
-                            showCopiedMessage = false
+                            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
+                                showCopiedMessage = false
+                            }
+                        }) {
+                            Text(group.id)
+                                .foregroundColor(.primary)
                         }
-                    }) {
-                        Text(group.id)
-                            .foregroundColor(.primary)
                     }
-                }
 
-                Section("Members") {
-                    ForEach(group.members) { member in
-                        Text(member.username)
+                    Section("Members") {
+                        ForEach(members) { member in
+                            Text(member.username)
+                        }
                     }
+                    Button(role: .destructive, action: { showingConfirmation = true }) {
+                        Text("Delete Group")
+                    }
+                    .confirmationDialog("Are you sure you want to delete this group?", isPresented: $showingConfirmation, titleVisibility: .visible) {
+                        Button("Delete Group", role: .destructive, action: deleteGroup)
+                        Button("Cancel", role: .cancel, action: {})
+                    }
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(.red)
                 }
-                Button(role: .destructive, action: { showingConfirmation = true }) {
-                    Text("Delete Group")
-                }
-                .confirmationDialog("Are you sure you want to delete this group?", isPresented: $showingConfirmation, titleVisibility: .visible) {
-                    Button("Delete Group", role: .destructive, action: deleteGroup)
-                    Button("Cancel", role: .cancel, action: {})
-                }
-                .frame(maxWidth: .infinity)
-                .foregroundColor(.red)
             }
+            .navigationTitle(Text("Group details"))
+            .navigationBarTitleDisplayMode(.inline)
+        } else {
+            ProgressView()
+                .task {
+                    // TODO: ADD ERROR HANDLING
+                    members = try? await FirebaseService.shared.fetchUsers(withIDs: group.members.map(\.id))
+                }
+                .navigationTitle(Text("Group details"))
+                .navigationBarTitleDisplayMode(.inline)
         }
-        .navigationTitle(Text("Group details"))
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func deleteGroup() {
@@ -71,5 +83,5 @@ struct GroupDetailsView: View {
 }
 
 #Preview {
-    GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [User(id: "id1", username: "User1", email: "test@test.com"), User(id: "id2", username: "User3", email: "test@test.com"), User(id: "id3", username: "User2", email: "test@test.com"), User(id: "id4", username: "User3", email: "test@test.com")]))
+    GroupDetailsView(group: Group(id: UUID().uuidString, name: "Test Group", members: [StringID(UUID().uuidString)]))
 }

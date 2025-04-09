@@ -55,7 +55,7 @@ struct CreateGroupView: View {
             return
         }
         // TODO: HANDLE NILABLE USER
-        createdGroup = dataService.addGroup(UUID().uuidString, groupName, [firebaseService.currentUser ?? User(id: "failed", username: "failed", email: "failed@gmail.com")])
+        createdGroup = dataService.addGroup(UUID().uuidString, groupName, [StringID(firebaseService.currentUser?.id ?? "failed")])
 
         // TODO: HANDLE NILABLE GROUP
         FirebaseService.shared.saveGroup(createdGroup ?? Group(id: UUID().uuidString, name: "failed", members: []))

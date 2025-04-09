@@ -78,9 +78,7 @@ class FirebaseService {
                 return nil
             }
 
-            let members = try await fetchUsers(withIDs: memberIDs)
-
-            let group = Group(id: id, name: name, members: members)
+            let group = Group(id: id, name: name, members: memberIDs.map { StringID($0) })
             group.timeStamp = timestamp.dateValue()
             return group
 
