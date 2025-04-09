@@ -64,10 +64,20 @@ struct AddGroupView: View {
 
     private func addGroup() async {
         guard !groupID.isEmpty else { return }
+        guard let userID = firebaseService.currentUser?.id else {
+            print("Error: No current user ID")
+            return
+        }
+
+        let stringUserID = StringID(userID)
+
         group = await firebaseService.fetchGroup(id: groupID)
         if let newGroup = group {
-            // newGroup.members += [firebaseService.currentUser?.id ?? "Error"]
+            if !newGroup.members.contains(stringUserID) {
+                newGroup.members.append(stringUserID)
+            }
             group = dataService.addGroup(newGroup.id, newGroup.name, newGroup.members)
+            firebaseService.saveGroup(newGroup)
             joinGroup = true
         }
     }
