@@ -73,9 +73,12 @@ struct AddGroupView: View {
 
         group = await firebaseService.fetchGroup(id: groupID)
         if let newGroup = group {
-            if !newGroup.members.contains(stringUserID) {
-                newGroup.members.append(stringUserID)
+            guard !newGroup.members.contains(where: { $0.id == userID }) else {
+                return
             }
+
+            newGroup.members.append(stringUserID)
+
             group = dataService.addGroup(newGroup.id, newGroup.name, newGroup.members)
             firebaseService.saveGroup(newGroup)
             joinGroup = true
