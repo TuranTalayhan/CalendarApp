@@ -10,37 +10,33 @@ import SwiftUI
 struct AssigneePicker: View {
     let group: Group?
     let firebaseService = FirebaseService.shared
-    @Binding var assignee: User?
+    @Binding var assignee: String?
     @State private var members: [User]?
 
     var body: some View {
         if let members = members {
             Picker("Assignee", selection: $assignee) {
-                Text("None").tag(nil as User?)
+                Text("None").tag(nil as String?)
 
-                if !members.isEmpty {
-                    ForEach(members) { member in
-                        Text(member.username).tag(member)
-                    }
-                } else {
-                    // TODO: HANDLE NILABLE USER
-                    Text(firebaseService.currentUser?.username ?? "Failed").tag(firebaseService.currentUser as User?)
+                ForEach(members) { member in
+                    Text(member.username).tag(member.id)
                 }
 
-                if let assignee = assignee {
-                    Text(assignee.username).tag(assignee)
+                // TODO: HANDLE NILABLE USER
+                if members.count == 0 {
+                    Text(firebaseService.currentUser?.username ?? "Error").tag(firebaseService.currentUser?.id)
                 }
             }
         } else {
             ProgressView()
                 .task {
                     // TODO: ADD ERROR HANDLING
-                    members = try? await FirebaseService.shared.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
+                    members = try? await firebaseService.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
                 }
         }
     }
 }
 
 #Preview {
-    AssigneePicker(group: nil, assignee: .constant(User(id: "id5", username: "username", email: "email")))
+    AssigneePicker(group: nil, assignee: .constant(UUID().uuidString))
 }

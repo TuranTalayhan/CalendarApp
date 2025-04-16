@@ -19,10 +19,10 @@ final class Event: Comparable, Identifiable {
     var notes: String?
     var alert: Int
     var group: Group?
-    var assignedTo: User?
+    var assignedTo: String?
     var timestamp: Date = Date()
 
-    init(id: String, title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, group: Group?, assignedTo: User?) {
+    init(id: String, title: String, allDay: Bool, startTime: Date, endTime: Date, url: URL?, notes: String?, alert: Int, group: Group?, assignedTo: String?) {
         self.id = id
         self.title = title
         self.allDay = allDay

@@ -30,12 +30,12 @@ class FirebaseService {
         if let url = event.url?.absoluteString { data["url"] = url }
         if let notes = event.notes { data["notes"] = notes }
         if let groupId = event.group?.id { data["group"] = groupId }
-        if let assignedToId = event.assignedTo?.id { data["assignedTo"] = assignedToId }
+        if let assignedToId = event.assignedTo { data["assignedTo"] = assignedToId }
 
         if let group = event.group {
             firestore.collection("groups").document(group.id).collection("events").document(event.id).setData(data)
         } else if let assignedTo = event.assignedTo {
-            firestore.collection("users").document(assignedTo.id).collection("events").document(event.id).setData(data)
+            firestore.collection("users").document(assignedTo).collection("events").document(event.id).setData(data)
         } else if let currentUser = currentUser {
             firestore.collection("users").document(currentUser.id).collection("events").document(event.id).setData(data)
         } else {
@@ -47,7 +47,7 @@ class FirebaseService {
         if let group = event.group {
             firestore.collection("groups").document(group.id).collection("events").document(event.id).delete()
         } else if let assignedTo = event.assignedTo {
-            firestore.collection("users").document(assignedTo.id).collection("events").document(event.id).delete()
+            firestore.collection("users").document(assignedTo).collection("events").document(event.id).delete()
         } else if let currentUser = currentUser {
             firestore.collection("users").document(currentUser.id).collection("events").document(event.id).delete()
         }
@@ -57,7 +57,7 @@ class FirebaseService {
         let data: [String: Any] = [
             "name": group.name,
             "members": group.members.map(\.id),
-            "timeStamp": group.timeStamp,
+            "timestamp": group.timestamp,
         ]
 
         firestore.collection("groups").document(group.id).setData(data)
@@ -73,13 +73,13 @@ class FirebaseService {
             guard let data = docSnapshot.data(),
                   let name = data["name"] as? String,
                   let memberIDs = data["members"] as? [String],
-                  let timestamp = data["timeStamp"] as? Timestamp
+                  let timestamp = data["timestamp"] as? Timestamp
             else {
                 return nil
             }
 
             let group = Group(id: id, name: name, members: memberIDs.map { StringID($0) })
-            group.timeStamp = timestamp.dateValue()
+            group.timestamp = timestamp.dateValue()
             return group
 
         } catch {
@@ -89,6 +89,7 @@ class FirebaseService {
     }
 
     func fetchUsers(withIDs IDs: [String]) async throws -> [User] {
+        // TODO: REMOVE THROWS
         guard !IDs.isEmpty else {
             return []
         }
@@ -109,6 +110,144 @@ class FirebaseService {
             }
         }
         return users
+    }
+
+    func fetchUser(_ id: String) async throws -> User? {
+        let userSnapshot = try? await firestore.collection("users").document(id).getDocument()
+
+        if let data = userSnapshot?.data(),
+           let username = data["username"] as? String,
+           let email = data["email"] as? String
+        {
+            return User(id: id, username: username, email: email)
+        }
+        return nil
+    }
+
+    // TODO: COMPARE TIMESTAMP
+    func fetchGroup(_ id: String) async throws -> Group? {
+        let groupSnapshot = try? await firestore.collection("groups").document(id).getDocument()
+
+        if let data = groupSnapshot?.data(),
+           let name = data["name"] as? String,
+           let memberIDs = data["members"] as? [String],
+           let timestamp = data["timestamp"] as? Timestamp
+        {
+            return Group(id: id, name: name, members: memberIDs.map { StringID($0) })
+        } else {
+            return nil
+        }
+    }
+
+    func fetchUserGroups() async throws -> [Group]? {
+        // TODO: REMOVE THROWS
+        let groupSnapshots = try? await firestore.collection("groups").whereField("members", arrayContains: currentUser?.id ?? "").getDocuments()
+
+        if let documents = groupSnapshots?.documents {
+            var groups: [Group] = []
+            for document in documents {
+                let data = document.data()
+                guard let name = data["name"] as? String,
+                      let memberIDs = data["members"] as? [String],
+                      let timestamp = data["timestamp"] as? Timestamp
+                else {
+                    return nil
+                }
+                let group = Group(id: document.documentID, name: name, members: memberIDs.map { StringID($0) })
+                group.timestamp = timestamp.dateValue()
+                groups.append(group)
+            }
+            return groups
+        }
+
+        return nil
+    }
+
+    func fetchUserEvents() async -> [Event] {
+        guard let userId = currentUser?.id else { return [] }
+        var allEvents: [Event] = []
+
+        do {
+            let groupSnapshot = try await firestore
+                .collection("groups")
+                .whereField("members", arrayContains: userId)
+                .getDocuments()
+
+            for groupDoc in groupSnapshot.documents {
+                let groupId = groupDoc.documentID
+                let eventsSnapshot = try await firestore
+                    .collection("groups")
+                    .document(groupId)
+                    .collection("events")
+                    .getDocuments()
+
+                for doc in eventsSnapshot.documents {
+                    if let event = try? await parseEvent(doc: doc, groupId: groupId) {
+                        allEvents.append(event)
+                    }
+                }
+            }
+
+            let userEventSnapshot = try await firestore
+                .collection("users")
+                .document(userId)
+                .collection("events")
+                .getDocuments()
+
+            for doc in userEventSnapshot.documents {
+                if let event = try? await parseEvent(doc: doc, groupId: nil) {
+                    allEvents.append(event)
+                }
+            }
+
+        } catch {
+            print("Error fetching events: \(error)")
+        }
+
+        return allEvents
+    }
+
+    private func parseEvent(doc: QueryDocumentSnapshot, groupId: String?) async throws -> Event? {
+        let data = doc.data()
+
+        guard let name = data["name"] as? String,
+              let allDay = data["allDay"] as? Bool,
+              let startDate = data["startDate"] as? Timestamp,
+              let endDate = data["endDate"] as? Timestamp,
+              let alert = data["alert"] as? Int,
+              let timestamp = data["timestamp"] as? Timestamp
+        else {
+            return nil
+        }
+
+        let urlString = data["url"] as? String
+        let url = urlString.flatMap { URL(string: $0) }
+
+        let notes = data["notes"] as? String
+        let assignedToId = data["assignedTo"] as? String
+        let assignedUser = assignedToId != nil ? try? await fetchUsers(withIDs: [assignedToId!]).first : nil
+
+        var group: Group?
+
+        if let groupId = groupId {
+            group = try? await fetchGroup(groupId)
+        }
+
+        let event = Event(
+            id: doc.documentID,
+            title: name,
+            allDay: allDay,
+            startTime: startDate.dateValue(),
+            endTime: endDate.dateValue(),
+            url: url,
+            notes: notes,
+            alert: alert,
+            group: group,
+            assignedTo: assignedUser?.id
+        )
+        event.timestamp = timestamp.dateValue()
+
+        return event
     }
 
     func RegisterWithEmail(_ username: String, _ email: String, _ password: String, completion: @escaping (Error?) -> Void) {
@@ -153,6 +292,18 @@ class FirebaseService {
             let user = User(id: self.getCurrentUser()?.id ?? UUID().uuidString, username: self.getCurrentUser()?.username ?? "", email: self.getCurrentUser()?.email ?? "")
             self.currentUser = user
             completion(nil)
+        }
+    }
+
+    func LogInChecked(email: String, password: String) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.LogInWithEmail(email, password) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
         }
     }
 

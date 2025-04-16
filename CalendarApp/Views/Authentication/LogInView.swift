@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct LogInView: View {
+    @Environment(\.modelContext) private var modelContext
     @Binding var isLoggedIn: Bool
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var errorAlert: Bool = false
     private let firebaseService = FirebaseService.shared
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
+    }
 
     var body: some View {
         NavigationStack {
@@ -27,9 +31,9 @@ struct LogInView: View {
                         .autocapitalization(.none)
                     SecureField("Password", text: $password)
                 }
-                Button(action: {
-                    LogIn()
-                }) {
+                Button(action: { Task {
+                    await LogIn()
+                }}) {
                     Text("Log In")
                         .frame(maxWidth: .infinity)
                 }
@@ -72,18 +76,26 @@ struct LogInView: View {
         }
     }
 
-    private func LogIn() {
+    private func LogIn() async {
         guard !email.isEmpty, !password.isEmpty else {
             errorAlert = true
             return
         }
-        firebaseService.LogInWithEmail(email, password) { error in
-            if let error = error {
-                print("Login failed: \(error.localizedDescription)")
-                errorAlert = true
-                return
+
+        do {
+            try await firebaseService.LogInChecked(email: email, password: password)
+
+            if let groups = try? await firebaseService.fetchUserGroups() {
+                dataService.addGroups(groups)
             }
+
+            let events = await firebaseService.fetchUserEvents()
+            dataService.addEvents(events)
+
             isLoggedIn = true
+        } catch {
+            print("Login failed: \(error.localizedDescription)")
+            errorAlert = true
         }
     }
 }

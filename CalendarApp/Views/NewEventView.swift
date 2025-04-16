@@ -21,7 +21,7 @@ struct NewEventView: View {
     @State private var notes: String = ""
     @State private var showInvalidDatesAlert: Bool = false
     @State private var alert: Int = -1
-    @State private var assignee: User?
+    @State private var assignee: String?
     @State private var selectedGroup: Group?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)

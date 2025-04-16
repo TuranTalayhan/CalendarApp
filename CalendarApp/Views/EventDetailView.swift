@@ -24,6 +24,10 @@ struct EventDetailView: View {
         DMIAPIService()
     }
 
+    let firebaseService = FirebaseService.shared
+
+    @State private var user: User?
+
     var body: some View {
         VStack(alignment: .leading) {
             Text(event.title)
@@ -33,7 +37,7 @@ struct EventDetailView: View {
 
             EventDateView(event: event)
 
-            if let assignedTo = event.assignedTo {
+            if let assignedTo = user {
                 Text("Assignee")
                 Text(assignedTo.username)
                     .foregroundColor(.secondary)
@@ -81,6 +85,7 @@ struct EventDetailView: View {
         .navigationTitle("Event Details")
         .navigationBarTitleDisplayMode(.inline)
         .task {
+            user = await fetchUser()
             temperature = getTemperature(response: await fetchTemperature())
         }
         .onChange(of: temperature == 0) { temperatureAlert = true }
@@ -123,9 +128,17 @@ struct EventDetailView: View {
         return 0
     }
 
+    private func fetchUser() async -> User? {
+        if let assignedTo = event.assignedTo {
+            return try? await firebaseService.fetchUser(assignedTo)
+        }
+
+        return nil
+    }
+
     private func deleteEvent() {
         withAnimation {
-            FirebaseService.shared.deleteEvent(event)
+            firebaseService.deleteEvent(event)
             dataService.deleteEvent(event)
             self.presentationMode.wrappedValue.dismiss()
         }
@@ -133,5 +146,5 @@ struct EventDetailView: View {
 }
 
 #Preview {
-    EventDetailView(event: Event(id: UUID().uuidString, title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(id: UUID().uuidString, name: "group name", members: []), assignedTo: User(id: "id1", username: "Turan", email: "turan@gmail.com")))
+    EventDetailView(event: Event(id: UUID().uuidString, title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(id: UUID().uuidString, name: "group name", members: []), assignedTo: UUID().uuidString))
 }
