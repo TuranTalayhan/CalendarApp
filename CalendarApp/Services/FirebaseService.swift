@@ -81,7 +81,6 @@ class FirebaseService {
             }
 
             try await groupRef.delete()
-            print("Successfully deleted group and all its events.")
         } catch {
             print("Error deleting group or its events: \(error.localizedDescription)")
         }
