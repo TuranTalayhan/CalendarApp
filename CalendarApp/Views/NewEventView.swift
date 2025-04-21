@@ -22,7 +22,7 @@ struct NewEventView: View {
     @State private var showInvalidDatesAlert: Bool = false
     @State private var alert: Int = -1
     @State private var assignee: String?
-    @State private var selectedGroup: Group?
+    @State private var selectedGroup: String?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -54,7 +54,7 @@ struct NewEventView: View {
 
                 Section {
                     GroupPicker(groups: groups, selectedGroup: $selectedGroup)
-                    AssigneePicker(group: selectedGroup, assignee: $assignee)
+                    AssigneePicker(selectedGroup: selectedGroup, assignee: $assignee)
                 }
 
                 Section {

@@ -13,9 +13,16 @@ class FirebaseService {
     private let auth = Auth.auth()
     private let firestore = Firestore.firestore()
     private var handle: AuthStateDidChangeListenerHandle?
+    private var groupListener: ListenerRegistration?
+    private var eventListener: ListenerRegistration?
+    private var groupEventListeners: [ListenerRegistration] = []
     public var currentUser: User?
 
     private init() {}
+
+    deinit {
+        removeListeners()
+    }
 
     func saveEvent(_ event: Event) {
         var data: [String: Any] = [
@@ -29,11 +36,11 @@ class FirebaseService {
 
         if let url = event.url?.absoluteString { data["url"] = url }
         if let notes = event.notes { data["notes"] = notes }
-        if let groupId = event.group?.id { data["group"] = groupId }
+        if let groupId = event.group { data["group"] = groupId }
         if let assignedToId = event.assignedTo { data["assignedTo"] = assignedToId }
 
         if let group = event.group {
-            firestore.collection("groups").document(group.id).collection("events").document(event.id).setData(data)
+            firestore.collection("groups").document(group).collection("events").document(event.id).setData(data)
         } else if let assignedTo = event.assignedTo {
             firestore.collection("users").document(assignedTo).collection("events").document(event.id).setData(data)
         } else if let currentUser = currentUser {
@@ -45,7 +52,7 @@ class FirebaseService {
 
     func deleteEvent(_ event: Event) {
         if let group = event.group {
-            firestore.collection("groups").document(group.id).collection("events").document(event.id).delete()
+            firestore.collection("groups").document(group).collection("events").document(event.id).delete()
         } else if let assignedTo = event.assignedTo {
             firestore.collection("users").document(assignedTo).collection("events").document(event.id).delete()
         } else if let currentUser = currentUser {
@@ -63,8 +70,21 @@ class FirebaseService {
         firestore.collection("groups").document(group.id).setData(data)
     }
 
-    func deleteGroup(id: String) {
-        firestore.collection("groups").document(id).delete()
+    func deleteGroup(id: String) async {
+        let groupRef = firestore.collection("groups").document(id)
+        let eventsRef = groupRef.collection("events")
+
+        do {
+            let snapshot = try await eventsRef.getDocuments()
+            for doc in snapshot.documents {
+                try await doc.reference.delete()
+            }
+
+            try await groupRef.delete()
+            print("Successfully deleted group and all its events.")
+        } catch {
+            print("Error deleting group or its events: \(error.localizedDescription)")
+        }
     }
 
     func fetchGroup(id: String) async -> Group? {
@@ -124,87 +144,132 @@ class FirebaseService {
         return nil
     }
 
-    // TODO: COMPARE TIMESTAMP
-    func fetchGroup(_ id: String) async throws -> Group? {
-        let groupSnapshot = try? await firestore.collection("groups").document(id).getDocument()
-
-        if let data = groupSnapshot?.data(),
-           let name = data["name"] as? String,
-           let memberIDs = data["members"] as? [String],
-           let timestamp = data["timestamp"] as? Timestamp
-        {
-            return Group(id: id, name: name, members: memberIDs.map { StringID($0) })
-        } else {
-            return nil
+    func listenToUserGroups(update: @escaping ([Group]) -> Void) {
+        guard let userId = currentUser?.id else {
+            update([])
+            return
         }
-    }
 
-    func fetchUserGroups() async throws -> [Group]? {
-        // TODO: REMOVE THROWS
-        let groupSnapshots = try? await firestore.collection("groups").whereField("members", arrayContains: currentUser?.id ?? "").getDocuments()
-
-        if let documents = groupSnapshots?.documents {
-            var groups: [Group] = []
-            for document in documents {
-                let data = document.data()
-                guard let name = data["name"] as? String,
-                      let memberIDs = data["members"] as? [String],
-                      let timestamp = data["timestamp"] as? Timestamp
-                else {
-                    return nil
+        groupListener = firestore.collection("groups")
+            .whereField("members", arrayContains: userId)
+            .addSnapshotListener(includeMetadataChanges: true) { snapshot, error in
+                if let error = error {
+                    print("Error listening to user groups: \(error.localizedDescription)")
+                    return
                 }
-                let group = Group(id: document.documentID, name: name, members: memberIDs.map { StringID($0) })
-                group.timestamp = timestamp.dateValue()
-                groups.append(group)
-            }
-            return groups
-        }
 
-        return nil
+                guard let documents = snapshot?.documents else {
+                    update([])
+                    return
+                }
+
+                var groups: [Group] = []
+                for document in documents {
+                    let data = document.data()
+                    guard let name = data["name"] as? String,
+                          let memberIDs = data["members"] as? [String],
+                          let timestamp = data["timestamp"] as? Timestamp
+                    else {
+                        continue
+                    }
+                    let group = Group(id: document.documentID, name: name, members: memberIDs.map { StringID($0) })
+                    group.timestamp = timestamp.dateValue()
+                    groups.append(group)
+                }
+                return update(groups)
+            }
     }
 
-    func fetchUserEvents() async -> [Event] {
-        guard let userId = currentUser?.id else { return [] }
+    func listenToUserEvents(update: @escaping ([Event]) -> Void) {
+        guard let userId = currentUser?.id else {
+            update([])
+            return
+        }
+
+        let eventUpdateQueue = DispatchQueue(label: "com.calendarApp.eventUpdateQueue")
         var allEvents: [Event] = []
 
-        do {
-            let groupSnapshot = try await firestore
-                .collection("groups")
-                .whereField("members", arrayContains: userId)
-                .getDocuments()
+        eventListener = firestore.collection("users")
+            .document(userId)
+            .collection("events")
+            .addSnapshotListener(includeMetadataChanges: true) { snapshot, error in
+                if let error = error {
+                    print("Error: \(error)")
+                    return
+                }
 
-            for groupDoc in groupSnapshot.documents {
-                let groupId = groupDoc.documentID
-                let eventsSnapshot = try await firestore
-                    .collection("groups")
-                    .document(groupId)
-                    .collection("events")
-                    .getDocuments()
+                Task {
+                    var events: [Event] = []
 
-                for doc in eventsSnapshot.documents {
-                    if let event = try? await parseEvent(doc: doc, groupId: groupId) {
-                        allEvents.append(event)
+                    for doc in snapshot?.documents ?? [] {
+                        if let event = try? await self.parseEvent(doc: doc, groupId: nil) {
+                            events.append(event)
+                        }
+                    }
+
+                    eventUpdateQueue.async {
+                        allEvents.removeAll(where: { $0.group == nil })
+                        allEvents.append(contentsOf: events)
+                        DispatchQueue.main.async {
+                            update(allEvents)
+                        }
                     }
                 }
             }
 
-            let userEventSnapshot = try await firestore
-                .collection("users")
-                .document(userId)
-                .collection("events")
-                .getDocuments()
+        firestore.collection("groups")
+            .whereField("members", arrayContains: userId)
+            .getDocuments { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching groups for event listeners: \(error?.localizedDescription ?? "unknown")")
+                    return
+                }
 
-            for doc in userEventSnapshot.documents {
-                if let event = try? await parseEvent(doc: doc, groupId: nil) {
-                    allEvents.append(event)
+                for doc in documents {
+                    let groupId = doc.documentID
+
+                    let listener = self.firestore
+                        .collection("groups")
+                        .document(groupId)
+                        .collection("events")
+                        .addSnapshotListener(includeMetadataChanges: true) { snapshot, error in
+                            if let error = error {
+                                print("Error listening to events in group \(groupId): \(error.localizedDescription)")
+                                return
+                            }
+
+                            Task {
+                                var groupEvents: [Event] = []
+
+                                for doc in snapshot?.documents ?? [] {
+                                    if let event = try? await self.parseEvent(doc: doc, groupId: groupId) {
+                                        groupEvents.append(event)
+                                    }
+                                }
+
+                                eventUpdateQueue.async {
+                                    allEvents.removeAll(where: { $0.group == groupId })
+                                    allEvents.append(contentsOf: groupEvents)
+                                    DispatchQueue.main.async {
+                                        update(allEvents)
+                                    }
+                                }
+                            }
+                        }
+
+                    self.groupEventListeners.append(listener)
                 }
             }
+    }
 
-        } catch {
-            print("Error fetching events: \(error)")
+    func removeListeners() {
+        groupListener?.remove()
+        eventListener?.remove()
+
+        for listener in groupEventListeners {
+            listener.remove()
         }
-
-        return allEvents
+        groupEventListeners.removeAll()
     }
 
     private func parseEvent(doc: QueryDocumentSnapshot, groupId: String?) async throws -> Event? {
@@ -227,12 +292,6 @@ class FirebaseService {
         let assignedToId = data["assignedTo"] as? String
         let assignedUser = assignedToId != nil ? try? await fetchUsers(withIDs: [assignedToId!]).first : nil
 
-        var group: Group?
-
-        if let groupId = groupId {
-            group = try? await fetchGroup(groupId)
-        }
-
         let event = Event(
             id: doc.documentID,
             title: name,
@@ -242,7 +301,7 @@ class FirebaseService {
             url: url,
             notes: notes,
             alert: alert,
-            group: group,
+            group: groupId,
             assignedTo: assignedUser?.id
         )
         event.timestamp = timestamp.dateValue()

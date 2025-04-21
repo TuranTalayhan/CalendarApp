@@ -8,10 +8,11 @@ import FirebaseAuth
 import SwiftUI
 
 struct AssigneePicker: View {
-    let group: Group?
+    let selectedGroup: String?
     let firebaseService = FirebaseService.shared
     @Binding var assignee: String?
     @State private var members: [User]?
+    @State private var group: Group?
 
     var body: some View {
         if let members = members {
@@ -30,6 +31,9 @@ struct AssigneePicker: View {
         } else {
             ProgressView()
                 .task {
+                    if let selectedGroup = selectedGroup {
+                        group = await firebaseService.fetchGroup(id: selectedGroup)
+                    }
                     // TODO: ADD ERROR HANDLING
                     members = try? await firebaseService.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
                 }
@@ -38,5 +42,5 @@ struct AssigneePicker: View {
 }
 
 #Preview {
-    AssigneePicker(group: nil, assignee: .constant(UUID().uuidString))
+    AssigneePicker(selectedGroup: nil, assignee: .constant(UUID().uuidString))
 }

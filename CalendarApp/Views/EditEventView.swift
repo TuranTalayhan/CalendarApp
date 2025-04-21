@@ -24,7 +24,7 @@ struct EditEventView: View {
     @State private var showAlert: Bool = false
     @State private var alert: Int = -1
     @State private var assignee: String?
-    @State private var selectedGroup: Group?
+    @State private var selectedGroup: String?
     private var dataService: LocalDataService {
         LocalDataService(context: modelContext)
     }
@@ -75,7 +75,7 @@ struct EditEventView: View {
 
                 Section {
                     GroupPicker(groups: groups, selectedGroup: $selectedGroup)
-                    AssigneePicker(group: selectedGroup, assignee: $assignee)
+                    AssigneePicker(selectedGroup: selectedGroup, assignee: $assignee)
                 }
 
                 Section {
@@ -157,5 +157,5 @@ struct EditEventView: View {
 
 #Preview {
     @Previewable @Environment(\.dismiss) var dismiss: DismissAction
-    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(id: UUID().uuidString, title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(id: UUID().uuidString, name: "group name", members: []), assignedTo: UUID().uuidString))
+    EditEventView(isPresented: .constant(true), parentDismiss: dismiss, event: Event(id: UUID().uuidString, title: "Event name", allDay: false, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: UUID().uuidString, assignedTo: UUID().uuidString))
 }

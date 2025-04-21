@@ -42,8 +42,11 @@ struct GroupsView: View {
     private func deleteGroups(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                FirebaseService.shared.deleteGroup(id: groups[index].id)
-                dataService.deleteGroup(groups[index])
+                let group = groups[index]
+                Task {
+                    await FirebaseService.shared.deleteGroup(id: group.id)
+                    dataService.deleteGroup(group)
+                }
             }
         }
     }

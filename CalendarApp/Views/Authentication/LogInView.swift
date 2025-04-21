@@ -8,15 +8,11 @@
 import SwiftUI
 
 struct LogInView: View {
-    @Environment(\.modelContext) private var modelContext
     @Binding var isLoggedIn: Bool
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var errorAlert: Bool = false
     private let firebaseService = FirebaseService.shared
-    private var dataService: LocalDataService {
-        LocalDataService(context: modelContext)
-    }
 
     var body: some View {
         NavigationStack {
@@ -83,14 +79,7 @@ struct LogInView: View {
         }
 
         do {
-            try await firebaseService.LogInChecked(email: email, password: password)
-
-            if let groups = try? await firebaseService.fetchUserGroups() {
-                dataService.addGroups(groups)
-            }
-
-            let events = await firebaseService.fetchUserEvents()
-            dataService.addEvents(events)
+            try await FirebaseService.shared.LogInChecked(email: email, password: password)
 
             isLoggedIn = true
         } catch {

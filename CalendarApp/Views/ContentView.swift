@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
     @Binding var isLoggedIn: Bool
     @Binding var hasLoaded: Bool
+    private let firebaseService = FirebaseService.shared
+    private var dataService: LocalDataService {
+        LocalDataService(context: modelContext)
+    }
 
     var body: some View {
         if !hasLoaded {
@@ -34,6 +39,18 @@ struct ContentView: View {
                         Image(systemName: "gearshape")
                         Text("Settings")
                     }
+            }
+            .onAppear {
+                firebaseService.listenToUserGroups { groups in
+                    dataService.replaceGroups(with: groups)
+                }
+
+                firebaseService.listenToUserEvents { events in
+                    dataService.replaceEvents(with: events)
+                }
+            }
+            .onDisappear {
+                firebaseService.removeListeners()
             }
         }
     }

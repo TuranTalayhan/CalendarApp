@@ -74,10 +74,12 @@ struct GroupDetailsView: View {
     }
 
     private func deleteGroup() {
-        withAnimation {
-            FirebaseService.shared.deleteGroup(id: group.id)
+        Task {
+            await FirebaseService.shared.deleteGroup(id: group.id)
             dataService.deleteGroup(group)
-            self.presentationMode.wrappedValue.dismiss()
+            withAnimation {
+                self.presentationMode.wrappedValue.dismiss()
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ class LocalDataService {
         self.modelContext = context
     }
 
-    func addEvent(_ id: String, _ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?, _ alert: Int, _ group: Group? = nil, _ assignedTo: String? = nil) -> Event {
+    func addEvent(_ id: String, _ title: String, _ isAllDay: Bool, _ startDate: Date, _ endDate: Date, _ url: URL?, _ notes: String?, _ alert: Int, _ group: String? = nil, _ assignedTo: String? = nil) -> Event {
         let newEvent = Event(id: id, title: title, allDay: isAllDay, startTime: startDate, endTime: endDate, url: url, notes: notes, alert: alert, group: group, assignedTo: assignedTo)
         modelContext.insert(newEvent)
         try? modelContext.save()
@@ -28,6 +28,18 @@ class LocalDataService {
     func addEvents(_ events: [Event]) {
         for event in events {
             addEvent(event.id, event.title, event.allDay, event.startDate, event.endDate, event.url, event.notes, event.alert, event.group, event.assignedTo)
+        }
+    }
+
+    func replaceEvents(with newEvents: [Event]) {
+        do {
+            try modelContext.delete(model: Event.self)
+
+            addEvents(newEvents)
+
+            try modelContext.save()
+        } catch {
+            print("Failed to replace events: \(error.localizedDescription)")
         }
     }
 
@@ -44,6 +56,18 @@ class LocalDataService {
         }
     }
 
+    func replaceGroups(with newGroups: [Group]) {
+        do {
+            try modelContext.delete(model: Group.self)
+
+            addGroups(newGroups)
+
+            try modelContext.save()
+        } catch {
+            print("Failed to replace groups: \(error.localizedDescription)")
+        }
+    }
+
     func deleteEvent(_ event: Event) {
         userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
         modelContext.delete(event)
@@ -57,8 +81,28 @@ class LocalDataService {
     }
 
     func deleteGroup(_ group: Group) {
-        modelContext.delete(group)
-        try? modelContext.save()
+        let groupID = group.id
+
+        let fetchDescriptor = FetchDescriptor<Event>(
+            predicate: #Predicate { event in
+                event.group == groupID
+            }
+        )
+
+        do {
+            let eventsToDelete = try modelContext.fetch(fetchDescriptor)
+
+            for event in eventsToDelete {
+                userNotificationService.removeAllNotificationsWithIdentifiers(identifiers: [event.id])
+                modelContext.delete(event)
+            }
+
+            modelContext.delete(group)
+
+            try modelContext.save()
+        } catch {
+            print("Error deleting group and associated events: \(error)")
+        }
     }
 
     func deleteGroups(_ groups: [Group]) {

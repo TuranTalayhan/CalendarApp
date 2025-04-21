@@ -146,5 +146,5 @@ struct EventDetailView: View {
 }
 
 #Preview {
-    EventDetailView(event: Event(id: UUID().uuidString, title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: Group(id: UUID().uuidString, name: "group name", members: []), assignedTo: UUID().uuidString))
+    EventDetailView(event: Event(id: UUID().uuidString, title: "Event name", allDay: true, startTime: Date(), endTime: Date(), url: URL(string: "www.apple.com"), notes: "Note content", alert: 1, group: UUID().uuidString, assignedTo: UUID().uuidString))
 }
