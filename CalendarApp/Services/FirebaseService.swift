@@ -17,6 +17,7 @@ class FirebaseService {
     private var eventListener: ListenerRegistration?
     private var groupEventListeners: [ListenerRegistration] = []
     public var currentUser: User?
+    public var listenersAttached = false
 
     private init() {}
 
@@ -180,6 +181,8 @@ class FirebaseService {
     }
 
     func listenToUserEvents(update: @escaping ([Event]) -> Void) {
+        removeGroupEventListeners()
+
         guard let userId = currentUser?.id else {
             update([])
             return
@@ -261,14 +264,19 @@ class FirebaseService {
             }
     }
 
-    func removeListeners() {
-        groupListener?.remove()
-        eventListener?.remove()
-
+    private func removeGroupEventListeners() {
         for listener in groupEventListeners {
             listener.remove()
         }
         groupEventListeners.removeAll()
+    }
+
+    public func removeListeners() {
+        groupListener?.remove()
+        eventListener?.remove()
+
+        removeGroupEventListeners()
+        listenersAttached = false
     }
 
     private func parseEvent(doc: QueryDocumentSnapshot, groupId: String?) async throws -> Event? {

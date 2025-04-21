@@ -41,6 +41,9 @@ struct ContentView: View {
                     }
             }
             .onAppear {
+                guard !firebaseService.listenersAttached else { return }
+                firebaseService.listenersAttached = true
+
                 firebaseService.listenToUserGroups { groups in
                     dataService.replaceGroups(with: groups)
                 }
@@ -48,9 +51,6 @@ struct ContentView: View {
                 firebaseService.listenToUserEvents { events in
                     dataService.replaceEvents(with: events)
                 }
-            }
-            .onDisappear {
-                firebaseService.removeListeners()
             }
         }
     }

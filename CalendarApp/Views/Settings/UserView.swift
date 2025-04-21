@@ -39,6 +39,7 @@ struct UserView: View {
     private func LogOut() {
         dataService.deleteGroups(groups)
         dataService.deleteEvents(events)
+        firebaseService.removeListeners()
         firebaseService.signOut()
         isLoggedIn = false
     }
