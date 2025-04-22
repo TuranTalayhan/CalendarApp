@@ -150,6 +150,8 @@ class FirebaseService {
             return
         }
 
+        groupListener?.remove()
+
         groupListener = firestore.collection("groups")
             .whereField("members", arrayContains: userId)
             .addSnapshotListener(includeMetadataChanges: true) { snapshot, error in
