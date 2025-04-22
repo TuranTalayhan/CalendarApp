@@ -15,28 +15,28 @@ struct AssigneePicker: View {
     @State private var group: Group?
 
     var body: some View {
-        if let members = members {
-            Picker("Assignee", selection: $assignee) {
-                Text("None").tag(nil as String?)
+        Picker("Assignee", selection: $assignee) {
+            Text("None").tag(nil as String?)
 
+            if let members = members {
                 ForEach(members) { member in
                     Text(member.username).tag(member.id)
                 }
-
-                // TODO: HANDLE NILABLE USER
-                if members.count == 0 {
-                    Text(firebaseService.currentUser?.username ?? "Error").tag(firebaseService.currentUser?.id)
-                }
             }
-        } else {
-            ProgressView()
-                .task {
-                    if let selectedGroup = selectedGroup {
-                        group = await firebaseService.fetchGroup(id: selectedGroup)
-                    }
-                    // TODO: ADD ERROR HANDLING
-                    members = try? await firebaseService.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
+
+            // TODO: HANDLE NILABLE USER
+            if members?.count == 0 || members == nil {
+                Text(firebaseService.currentUser?.username ?? "Error").tag(firebaseService.currentUser?.id)
+            }
+        }
+        .onChange(of: selectedGroup) {
+            Task {
+                if let selectedGroup = selectedGroup {
+                    group = await firebaseService.fetchGroup(id: selectedGroup)
                 }
+                // TODO: ADD ERROR HANDLING
+                members = try? await firebaseService.fetchUsers(withIDs: group?.members.map(\.id) ?? [])
+            }
         }
     }
 }
