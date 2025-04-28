@@ -86,3 +86,13 @@ This **Calendar App** is an assignment for my **62417 Mobile Application Develop
 - Work with external APIs like **DMI’s Open Data API** for fetching real-time data.
 
 This project is a part of my coursework, and it will contribute to my final exam. The app is designed to be functional, scalable, and follow the best practices taught during the course.
+
+## Credits
+
+Some illustrations used in the Calendar App design are sourced from Freepik:
+
+- [Forgot Password Concept Illustration](https://www.freepik.com/free-vector/forgot-password-concept-illustration_7070629.htm?log-in=google#fromView=search&page=1&position=37&uuid=771c9316-8c18-43cd-a3a7-279964c69504&query=%40stories+password) from Freepik
+- [Relaxing at Home Concept Illustration](https://www.freepik.com/free-vector/relaxing-home-concept-illustration_6263623.htm#fromView=search&page=1&position=1&uuid=ef1f3e6b-e51a-4a8a-b314-89e301d829e7&query=%40stories+chill) from Freepik
+- [Group Concept Illustration](https://www.freepik.com/free-vector/group-concept-illustration_23844099.htm#fromView=search&page=1&position=9&uuid=4ddd7cec-accf-4f05-a5a7-967d6b415515&query=%40stories++group) from Freepik
+
+
