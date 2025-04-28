@@ -1,6 +1,6 @@
 # Calendar App
 
-Welcome to the **Calendar App**! This app is part of my assignment for the **62417 Mobile Application Development with Swift** course. It demonstrates key concepts learned during the course, including **SwiftUI, SwiftData, Firebase Authentication, and Firestore**. The app helps users efficiently manage events with a user-friendly interface, stores events locally using **SwiftData**, and provides additional features like weather information from **DMI’s Open Data API**.
+Welcome to the **Calendar App**. This app is part of my assignment for the **62417 Mobile Application Development with Swift** course. It demonstrates key concepts learned during the course, including **SwiftUI, SwiftData, Firebase Authentication, and Firestore**. The app helps users efficiently manage events with a user-friendly interface, stores events locally using **SwiftData**, and provides additional features like weather information from **DMI’s Open Data API**.
 
 ## Features
 
